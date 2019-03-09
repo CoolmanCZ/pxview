@@ -1,0 +1,284 @@
+Version 0.6.8
+	- fix some possible memory leaks, use ssize_t instead of size_t
+	  (thanks to Coolman for the patch)
+
+Version 0.6.7
+	- support for reproducible builds in debian
+
+Version 0.6.6
+	- fix various typos in documentation and code
+
+Version 0.6.5
+	???
+
+Version 0.6.4
+	- fixed bug in PX_timestamp2string()
+
+Version 0.6.3
+	- some man page updates
+	- check for more header files
+	- some code cleanups
+
+Version 0.6.2
+	- added support for cmake
+	- various small fixes to make it compile in a mingw environment
+	- works on amd64 (and probably other 64 bit architectures) again
+
+Version 0.6.1
+	- much better handling of databases with corrupted block number
+	- fixed rpm spec file (Copyright is now License)
+	- read tablename propperly from .Xnn and .XGn files
+	- set pxdoc->px_head to NULL in PX_new3() (allows to detect PX_new() without
+	  PX_open_fp())
+	- Fixed various error messages issued by pxlib
+	- PX_get_blob_data() returns 0 if blob is null.
+	- PX_insert_record() and PX_update_record() treat null values propperly.
+	- PX_insert_record() automatically counts up fields of type pxfAutoInc
+	  if the value is NULL. PX_create_fp() checks for more than one pxfAutoInc
+	  field and issues a warning, because the automatic incrementation works
+	  only with one field of that type.
+	- various man page updates
+	- PX_delete_record() now updates the internal index propperly
+	- fixed some compile errors when g++ is used, fixed some compile warnings
+	- fixed memory leak in PX_insert_record() and PX_update_record()
+
+Version 0.6.0
+	- fixed minor memory leak cause by memory used for the pxs_stream
+	- fixed reading of fields of type BCD
+	- conversion from multi byte to one byte strings in PX_put_data_alpha()
+	  terminates the resulting string propperly
+	- close file which was opened by PX_create_file()
+	- Add get_short_le_s() which returns signed short int because the size
+	  of a datablock as stored in the datablock header can be negative.
+	- fixed overflow in px_head->px_fileblocks which is now an unsigned
+	  int, as well as px_firstblock and px_lastblock. Also make get_short_le()
+	  return unsigned int. Thanks to Arkadiusz.
+	- fixed calculation for number of blocks needed by a blob which
+	  is stored in block of type 2
+	- _px_put_data_blob() doesn't store more than 64 blobs in block
+	  of type 3
+	- use a cache for reading encrypted blobs
+	- make databases opened with PX_open_file() writable
+	- added new functions PX_delete_record(), PX_update_record(),
+	  PX_insert_record() allowing to modify an existing database
+	- added new function PX_retrieve_record() which delivers a record
+	  as an array of (pxval_t *). This is a functional replacement for
+	  PX_get_record()
+
+Version 0.5.1
+	- fixed bug when reading header of blob (Thanks to Giovanni Giacobbi)
+	- fixes bug when reading blobs of a certain size from an encrypted
+	  .mb file.
+	- reading and writing encrypted blob files is more efficient.
+
+Version 0.5.0
+	- support for encrypted databases and blob files
+
+Version 0.4.4
+	- PX_get_data_alpha() may now return strings which are longer than
+	  the database field (e.g. when converting to a multibyte string)
+	- fixed reencoding which failed when the input string passed to
+	  iconv contains zeros
+	- codepage can be set when creating a database
+	- fixed copy and paste error in doc/pxlib.sgml
+	- added new function PX_create_blob_fp()
+	- fixed many compiler warnings and some potential errors
+	- added missing prototypes in paradox.h.in
+	- allow to turn off warnings
+	- PX_set_blob_file() works when reading and writing a file
+	- added missing man page for PX_create_blob_file()
+	- added overall man page for pxlib with many examples
+	- PX_get_value() now returns many fields from the header which
+	  makes accessing the header struct directly mostly superfluous
+
+Version 0.4.3
+	- added PX_timestamp2string() for conversion of paradox timestamps
+	  into a readable representation
+	- various fixed for writing blob files
+	- return value for bcd fields uses decimal_point from locale
+	- added spanish translations (thanks to jrodriguez@innox.com.mx)
+
+Version 0.4.2
+	- fixed possible errors in header of mb files
+	- added support for type 3 blocks in mb files
+
+Version 0.4.1
+	- various updates of debian files
+	- small changes to the build process
+
+Version 0.4.0
+	- support for writing blobs
+	- some man page updates
+
+Version 0.3.1
+	- fixed segm fault in put_px_datahead() when second datablock is written
+	- free memory when pxblob_t is deleted
+	- separated code for recoding into encode.c
+
+Version 0.3.0
+	- various man page updates
+	- Blob data stored in the record itself can be read
+	- added function PX_set_blob_file(), PX_has_blob_file()
+	- added function PX_get_data_bcd(), PX_put_data_bcd(), PX_get_data_blob(),
+	  PX_get_data_graphic()
+
+Version 0.2.11
+	- PX_read_blob_data() has been completely rewritten and can now handle
+	  any type of blob data. Watch for the new prototype.
+
+Version 0.2.10
+	- creating a paradox db without records led to a corrupted file
+	  because the header was not fill with zeros to its full size.
+
+Version 0.2.9
+	- new function PX_strdup() to duplicate a string but use the
+	  memory management functions of the paradox document.
+
+Version 0.2.8
+	- new function PX_get_opaque()
+	- fixed all references to PX_open_filename which is now PX_open_file
+	- pass const char to API function if possible
+	- updated build process
+	- Better checking whether px file belongs to db file
+
+Version 0.2.7
+	- added man pages for blob file handling
+	- set some more header fields. db and px files are now read correctly
+	  by the Paradox software.
+	- changed default file version to 7.0
+
+Version 0.2.6
+	- added new function PX_get_recordsize()
+	- set indexRoot and numIndexLevels in .PX files
+	- fixed segm fault when writing a primary index file
+	- fixed reading of blobs
+	- two new header fields are known (indexRoot, numIndexLevels)
+	- many more translations
+	- some more tweaking to finally store the file update time in the
+	  header without messing it up
+
+Version 0.2.5
+	- fixed man pages of PX_set_value|parameter. Both functions return int now.
+	- PX_set_parameter() returns -1 on error and 0 otherwise
+	- Issue a warning if setting a value which does not exist
+	- better error checking when setting the number of primary keys
+	- fixed some errors in writing primary index files
+		level 2 index entries are now supported
+	- readded time of modification when writing the header
+
+Version 0.2.4
+	- Paradox tables can be read by the Paradox software if the
+	  database is stored as version 5.0
+	- added prototypes for PX_[get|set]_[parameter|value]()
+	- all strings passed to PX_[get|set]_[parameter|value]() are of
+	  type const char
+	- PX_get_[parameter|value]() return value in passed parameter and
+	  return an error code instead
+	- Implemented function PX_get_parameter()
+	- All PX_get_data_xxx() functions return -1 on error, 0 if the
+	  field value is NULL and 1 otherwise.
+
+Version 0.2.3
+	- updated many error messages
+	- fixed segm fault when PX_close() was called more than once
+	- initial support for writing a primary index (experimental)
+
+Version 0.2.2
+	- initial multi language support
+	- added memory profiling
+	- free some more memory in PX_delete()
+	- renamed internal memory management functions from px_malloc, px_realloc,
+	  px_free to _px_malloc, _px_realloc, _px_free
+	- call pxdoc->free instead of px_free
+	- fixed potential buffer overrun
+	- PX_set_[target|input]encoding returns -2 if recoding is not supported
+
+Version 0.2.1
+	- PX_create_fp uses a fixed header size which was to small for databases with
+	  many fields. The header size is now calculated and set accordingly.
+
+Version 0.2.0
+	- update to latest autoconf tools
+	- added support for pkg-config
+	- added new function PX_new3() which allows to also set user data which
+	  is passed to the error handler
+	- added generic way to set and get parameters
+	- added support for external read, write, tell, seek functions
+
+Version 0.1.9
+	- encoding for data, that is to be written in a record can be set
+	- build internal primary index for faster access. This will not
+	  speed up searching but accessing records by record number.
+	- fixed reading of primary index, now that I understand how it works
+	- fixed data block handling (still not perfect, but works if records are
+	  stored sequentially)
+	- fixed several errors in fileformat which where due to lack of information
+	- provide header field 'fileUpdateTime'
+	- access data block as linked in list and not as stored in file
+	- new functions to manipulate record data
+	- made many error message better understandable
+	- initial support to write db files
+
+Version 0.1.2
+	- primary index files can be read
+	- added recno to struct px_datablockinfo
+	- PX_get_record returns in referenced parameter deleted whether a
+	  record is deleted or not
+
+Version 0.1.1
+	- fixed segm fault when calling PX_get_record()
+
+Version 0.1.0
+	- New function PX_get_record2() which has two extra parameter.
+	  One to enable reading of deleted records and one to return
+		internal data about the data block from which the record has
+		been read.
+	- added pxh->theonumrecords which is the number of records which
+	  theoretically fit into all data blocks. This number can be
+		much bigger that the number of records in the header. Also
+		increases the max. record number to theonumrecords
+		when reading a record.
+	- DB files can contain many more records than the number of records
+	  in the header. The remaining records are left overs, which were
+		deleted but not removed from the file. pxlib can now handle those
+		files.
+
+Version 0.0.9
+	- man pages are not created if docbook-to-man is missing
+	- fixed many endianess bugs
+	- new function PX_is_bigendian()
+	- new function PX_has_recode_support()
+	- fixed compile error with older versions of gcc
+	- fixed two potential segm faults
+
+Version 0.0.8
+	- more documentation
+	- recoding of data fields with iconv
+
+Version 0.0.7
+	- read more fields from the header
+	- added spec file to build rpms
+	- alpha fields are automatically recoded if required
+	- function to access alpha field data
+
+Version 0.0.6
+	- more documentation
+	- more functions to access database schema (PX_get_field(), PX_get_fields())
+	- much better check for errors as not passing a document or out of
+	  range values
+
+Version 0.0.5
+	- added PX_delete()
+	- many memory leaks fixed
+	- proper use of memory allocation functions
+
+Version 0.0.4
+  - fixed segm fault if input file does not exist
+	- maxTableSize may now be larger as 32
+	- add check for endianess
+	- added data conversion functions
+
+Version 0.0.3
+  - check for zero record size and header size
+	- added missing header files in distribution
+	- added conversion routine from Gregorian date to serial date number

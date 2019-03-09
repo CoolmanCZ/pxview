@@ -1,0 +1,156 @@
+<!doctype refentry PUBLIC "-//OASIS//DTD DocBook V4.1//EN" [
+
+<!-- Process this file with docbook-to-man to generate an nroff manual
+     page: `docbook-to-man manpage.sgml > manpage.1'.  You may view
+     the manual page with: `docbook-to-man manpage.sgml | nroff -man |
+     less'.  A typical entry in a Makefile or Makefile.am is:
+
+manpage.1: manpage.sgml
+	docbook-to-man $< > $@
+
+    
+	The docbook-to-man binary is found in the docbook-to-man package.
+	Please remember that if you create the nroff version in one of the
+	debian/rules file targets (such as build), you will need to include
+	docbook-to-man in your Build-Depends control field.
+
+  -->
+
+  <!-- Fill in your name for FIRSTNAME and SURNAME. -->
+  <!ENTITY dhfirstname "<firstname>UWE</firstname>">
+  <!ENTITY dhsurname   "<surname>STEINMANN</surname>">
+  <!-- Please adjust the date whenever revising the manpage. -->
+  <!ENTITY dhdate      "<date>February 14, 2006</date>">
+  <!-- SECTION should be 1-8, maybe w/ subsection other parameters are
+       allowed: see man(7), man(1). -->
+  <!ENTITY dhsection   "<manvolnum>3</manvolnum>">
+  <!ENTITY dhemail     "<email>uwe@steinmann.cx</email>">
+  <!ENTITY dhusername  "Uwe Steinmann">
+  <!ENTITY dhucpackage "<refentrytitle>PX_SET_PARAMETER</refentrytitle>">
+  <!ENTITY funcname    "PX_set_parameter">
+
+  <!ENTITY debian      "<productname>Debian</productname>">
+  <!ENTITY gnu         "<acronym>GNU</acronym>">
+  <!ENTITY gpl         "&gnu; <acronym>GPL</acronym>">
+]>
+
+<refentry>
+  <refentryinfo>
+    <address>
+      &dhemail;
+    </address>
+    <author>
+      &dhfirstname;
+      &dhsurname;
+    </author>
+    <copyright>
+      <year>2003-2006</year>
+      <holder>&dhusername;</holder>
+    </copyright>
+    &dhdate;
+  </refentryinfo>
+  <refmeta>
+    &dhucpackage;
+
+    &dhsection;
+  </refmeta>
+  <refnamediv>
+    <refname>&funcname;</refname>
+
+    <refpurpose>Sets various parameters</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <para>#include &lt;paradox.h&gt;</para>
+		<para>int &funcname;(pxdoc_t *pxdoc, const char *name, const char *value)</para>
+  </refsynopsisdiv>
+  <refsect1>
+    <title>DESCRIPTION</title>
+
+    <para>Sets the parameter <option>name</option> to the value
+		  <option>value</option>. This function must be used for all values
+			of type string. float-values can be set with PX_set_value(3).
+			<option>name</option> may be one of the following.</para>
+
+		<variablelist>
+		  <varlistentry>
+			  <term>tablename</term>
+			  <listitem>
+				  <para>The name of the table as it will be stored in the datbase
+					  header.
+					</para>
+				</listitem>
+			</varlistentry>
+		  <varlistentry>
+			  <term>password</term>
+			  <listitem>
+				  <para>Set the password for writing an encrypted database. It must
+					  be set before writing the first record. There
+					  is no need to set the password for reading a database.
+					</para>
+				</listitem>
+			</varlistentry>
+		  <varlistentry>
+			  <term>warning</term>
+			  <listitem>
+				  <para>Turn on/off warnings. Warnings are turned on by default.
+					</para>
+				</listitem>
+			</varlistentry>
+		  <varlistentry>
+			  <term>targetencoding</term>
+			  <listitem>
+				  <para>The encoding for the output. Data which is being read with
+					  one of the PX_get_data_xxx(3) functions will return string data
+						in the targetencoding.
+					</para>
+				</listitem>
+			</varlistentry>
+		  <varlistentry>
+			  <term>inputencoding</term>
+			  <listitem>
+				  <para>The econding of the input data which is to be stored into the
+					  database.
+					</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+  </refsect1>
+  <refsect1>
+    <title>RETURN VALUE</title>
+    <para>Returns 0 on success and -1 on failure.</para>
+  </refsect1>
+  <refsect1>
+    <title>SEE ALSO</title>
+
+    <para>
+			<function>PX_get_parameter(3)</function>,
+			<function>PX_set_value(3)</function>
+		</para>
+
+  </refsect1>
+  <refsect1>
+    <title>AUTHOR</title>
+
+    <para>This manual page was written by &dhusername; &dhemail;.</para>
+
+  </refsect1>
+</refentry>
+
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: sgml
+sgml-omittag:t
+sgml-shorttag:t
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:2
+sgml-indent-data:t
+sgml-parent-document:nil
+sgml-default-dtd-file:nil
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->
+
+

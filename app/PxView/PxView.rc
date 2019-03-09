@@ -1,0 +1,38 @@
+5551 ICON DISCARDABLE "PxView.ico"
+
+1 VERSIONINFO
+FILEVERSION     1,0,0,0
+PRODUCTVERSION  1,0,0,0
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "080904B0"
+    BEGIN
+      VALUE "CompanyName", "Radek Malcic"
+      VALUE "FileDescription", "PxView"
+      VALUE "FileVersion", "1.0.0"
+      VALUE "InternalName", "PxView"
+      VALUE "LegalCopyright", "Copyright (c) 2018 Radek Malcic"
+      VALUE "OriginalFilename", "PxView.exe"
+      VALUE "ProductName", "PxView"
+      VALUE "ProductVersion", "1.0.0"
+    END
+    BLOCK "040504B0"
+    BEGIN
+      VALUE "CompanyName", "Radek Malčic"
+      VALUE "FileDescription", "PxView"
+      VALUE "FileVersion", "1.0.0"
+      VALUE "InternalName", "PxView"
+      VALUE "LegalCopyright", "Copyright (c) 2018 Radek Malčic"
+      VALUE "OriginalFilename", "PxBiew.exe"
+      VALUE "ProductName", "PxView"
+      VALUE "ProductVersion", "1.0.0"
+    END
+  END
+
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x809, 1200, 0x405, 1200
+  END
+END
+

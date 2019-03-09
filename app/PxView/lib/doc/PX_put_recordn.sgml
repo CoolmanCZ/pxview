@@ -1,0 +1,128 @@
+<!doctype refentry PUBLIC "-//OASIS//DTD DocBook V4.1//EN" [
+
+<!-- Process this file with docbook-to-man to generate an nroff manual
+     page: `docbook-to-man manpage.sgml > manpage.1'.  You may view
+     the manual page with: `docbook-to-man manpage.sgml | nroff -man |
+     less'.  A typical entry in a Makefile or Makefile.am is:
+
+manpage.1: manpage.sgml
+	docbook-to-man $< > $@
+
+    
+	The docbook-to-man binary is found in the docbook-to-man package.
+	Please remember that if you create the nroff version in one of the
+	debian/rules file targets (such as build), you will need to include
+	docbook-to-man in your Build-Depends control field.
+
+  -->
+
+  <!-- Fill in your name for FIRSTNAME and SURNAME. -->
+  <!ENTITY dhfirstname "<firstname>UWE</firstname>">
+  <!ENTITY dhsurname   "<surname>STEINMANN</surname>">
+  <!-- Please adjust the date whenever revising the manpage. -->
+  <!ENTITY dhdate      "<date>April 28, 2003</date>">
+  <!-- SECTION should be 1-8, maybe w/ subsection other parameters are
+       allowed: see man(7), man(1). -->
+  <!ENTITY dhsection   "<manvolnum>3</manvolnum>">
+  <!ENTITY dhemail     "<email>uwe@steinmann.cx</email>">
+  <!ENTITY dhusername  "Uwe Steinmann">
+  <!ENTITY dhucpackage "<refentrytitle>PX_PUT_RECORDN</refentrytitle>">
+  <!ENTITY funcname    "PX_put_recordn">
+
+  <!ENTITY debian      "<productname>Debian</productname>">
+  <!ENTITY gnu         "<acronym>GNU</acronym>">
+  <!ENTITY gpl         "&gnu; <acronym>GPL</acronym>">
+]>
+
+<refentry>
+  <refentryinfo>
+    <address>
+      &dhemail;
+    </address>
+    <author>
+      &dhfirstname;
+      &dhsurname;
+    </author>
+    <copyright>
+      <year>2003</year>
+      <holder>&dhusername;</holder>
+    </copyright>
+    &dhdate;
+  </refentryinfo>
+  <refmeta>
+    &dhucpackage;
+
+    &dhsection;
+  </refmeta>
+  <refnamediv>
+    <refname>&funcname;</refname>
+
+    <refpurpose>Stores record in Paradox file at certain position</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <para>#include &lt;paradox.h&gt;</para>
+		<para>int &funcname;(pxdoc_t *pxdoc, char *data, int recpos)</para>
+  </refsynopsisdiv>
+  <refsect1>
+    <title>DESCRIPTION</title>
+
+    <para>Stores a record in the buffer <option>data</option> into a
+		  Paradox file at the given position <option>recpos</option>.
+			The first position has number 0. The function will determine the
+			data block for this record. If the position is after the last data
+			block, then as many as needed empty data blocks will be added.
+			If the position is in the middle of a data block and there is
+			no record right before the position, then the position will be
+			recalculated to make sure the new record will be stored in the
+			first free slot of the datablock. For example, if a datablock contains
+			10 records and the first call of <function>&funcname;</function> wants
+			to store a record at position 11, then this will be corrected to position
+			10. <function>&funcname;</function> will also add an empty data block
+			and store the record as the first record of the second data block.
+			Storing a second record at position 11 again, will be executed
+			without any position change.</para>
+		<para><option>data</option> must be constructed with PX_put_data_xxx(3)
+			functions before. It is of the same structure as the record returned
+			by PX_get_record(3) and PX_get_record2(3).</para>
+
+  </refsect1>
+  <refsect1>
+    <title>RETURN VALUE</title>
+    <para>Returns the record position on success and -1 on failure. The first
+		  position has number 0.</para>
+  </refsect1>
+  <refsect1>
+    <title>SEE ALSO</title>
+
+    <para>PX_get_record(3), PX_get_record2(3), PX_put_record(3),
+		  PX_put_data_byte(3),
+		  PX_put_data_short(3), PX_put_data_long(3), PX_put_data_double(3),
+			PX_put_data_alpha(3)</para>
+
+  </refsect1>
+  <refsect1>
+    <title>AUTHOR</title>
+
+    <para>This manual page was written by &dhusername; &dhemail;.</para>
+
+  </refsect1>
+</refentry>
+
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: sgml
+sgml-omittag:t
+sgml-shorttag:t
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:2
+sgml-indent-data:t
+sgml-parent-document:nil
+sgml-default-dtd-file:nil
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->
+
+

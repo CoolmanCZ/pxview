@@ -1,0 +1,193 @@
+<!doctype refentry PUBLIC "-//OASIS//DTD DocBook V4.1//EN" [
+
+<!-- Process this file with docbook-to-man to generate an nroff manual
+     page: `docbook-to-man manpage.sgml > manpage.1'.  You may view
+     the manual page with: `docbook-to-man manpage.sgml | nroff -man |
+     less'.  A typical entry in a Makefile or Makefile.am is:
+
+manpage.1: manpage.sgml
+	docbook-to-man $< > $@
+
+    
+	The docbook-to-man binary is found in the docbook-to-man package.
+	Please remember that if you create the nroff version in one of the
+	debian/rules file targets (such as build), you will need to include
+	docbook-to-man in your Build-Depends control field.
+
+  -->
+
+  <!-- Fill in your name for FIRSTNAME and SURNAME. -->
+  <!ENTITY dhfirstname "<firstname>UWE</firstname>">
+  <!ENTITY dhsurname   "<surname>STEINMANN</surname>">
+  <!-- Please adjust the date whenever revising the manpage. -->
+  <!ENTITY dhdate      "<date>August 22, 2005</date>">
+  <!-- SECTION should be 1-8, maybe w/ subsection other parameters are
+       allowed: see man(7), man(1). -->
+  <!ENTITY dhsection   "<manvolnum>3</manvolnum>">
+  <!ENTITY dhemail     "<email>uwe@steinmann.cx</email>">
+  <!ENTITY dhusername  "Uwe Steinmann">
+  <!ENTITY dhucpackage "<refentrytitle>PX_TIMESTAMP2STRING</refentrytitle>">
+  <!ENTITY funcname    "PX_timestamp2string">
+
+  <!ENTITY debian      "<productname>Debian</productname>">
+  <!ENTITY gnu         "<acronym>GNU</acronym>">
+  <!ENTITY gpl         "&gnu; <acronym>GPL</acronym>">
+]>
+
+<refentry>
+  <refentryinfo>
+    <address>
+      &dhemail;
+    </address>
+    <author>
+      &dhfirstname;
+      &dhsurname;
+    </author>
+    <copyright>
+      <year>2005</year>
+      <holder>&dhusername;</holder>
+    </copyright>
+    &dhdate;
+  </refentryinfo>
+  <refmeta>
+    &dhucpackage;
+
+    &dhsection;
+  </refmeta>
+  <refnamediv>
+    <refname>&funcname;</refname>
+
+    <refpurpose>Convert paradox timestamp into formatted string</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <para>#include &lt;paradox.h&gt;</para>
+		<para>char * &funcname;(pxdoc_t *pxdoc, double timestamp, const char *format)</para>
+  </refsynopsisdiv>
+  <refsect1>
+    <title>DESCRIPTION</title>
+
+    <para>Creates a string representation of a paradox timestamp as specified
+			in the parameter <parameter>format</parameter>.  The timestamp must be
+			either retrieved with <function>PX_get_data_double(3)</function> after
+			calling <function>PX_get_record(3)</function> or by simply using the
+			double value in the pxval_t struct as returned by
+			<function>PX_retrieve_record(3)</function>. A timestamp contains both
+			time and date information. The format string contains chars which stand
+			for certain values of the date/time. The following table lists all
+			available characters with a meaning. All other characters are being
+			copied unmodified to the output string. If a special character shall not
+			be interpreted it must be preceded with a backslash.</para>
+
+		<para>
+		 <table>
+		  <title>Characters and their meaning in date/time format string</title>
+			<tgroup cols="2">
+			 <thead>
+			  <row>
+				 <entry>Character</entry>
+				 <entry>Meaning</entry>
+				</row>
+			 </thead>
+			 <tbody>
+			  <row>
+				 <entry>Y</entry>
+				 <entry>year, numeric, 4 digits</entry>
+				</row>
+			  <row>
+				 <entry>y</entry>
+				 <entry>year, numeric, 2 digits</entry>
+				</row>
+			  <row>
+				 <entry>m</entry>
+				 <entry>month, numeric</entry>
+				</row>
+			  <row>
+				 <entry>n</entry>
+				 <entry>month, numeric, no leading zeroes</entry>
+				</row>
+			  <row>
+				 <entry>d</entry>
+				 <entry>day of the month, numeric</entry>
+				</row>
+			  <row>
+				 <entry>j</entry>
+				 <entry>day of the month, numeric, no leading zeros</entry>
+				</row>
+			  <row>
+				 <entry>H</entry>
+				 <entry>hour, numeric, 24 hour format</entry>
+				</row>
+			  <row>
+				 <entry>h</entry>
+				 <entry>hour, numeric, 12 hour format</entry>
+				</row>
+			  <row>
+				 <entry>G</entry>
+				 <entry>hour, numeric, 24 hour format, no leading zeroes</entry>
+				</row>
+			  <row>
+				 <entry>g</entry>
+				 <entry>hour, numeric, 12 hour format, no leading zeroes</entry>
+				</row>
+			  <row>
+				 <entry>i</entry>
+				 <entry>minutes, numeric</entry>
+				</row>
+			  <row>
+				 <entry>s</entry>
+				 <entry>seconds, numeric</entry>
+				</row>
+			  <row>
+				 <entry>A</entry>
+				 <entry>AM/PM</entry>
+				</row>
+			  <row>
+				 <entry>a</entry>
+				 <entry>am/pm</entry>
+				</row>
+			  <row>
+				 <entry>L</entry>
+				 <entry>boolean for leap year</entry>
+				</row>
+			 </tbody>
+		  </tgroup>
+		 </table>
+	  </para>
+
+  </refsect1>
+  <refsect1>
+    <title>RETURN VALUE</title>
+    <para>Returns pointer to string on success and NULL on failure.</para>
+  </refsect1>
+  <refsect1>
+    <title>SEE ALSO</title>
+
+    <para>PX_time2string(3), PX_date2string(3)</para>
+
+  </refsect1>
+  <refsect1>
+    <title>AUTHOR</title>
+
+    <para>This manual page was written by &dhusername; &dhemail;.</para>
+
+  </refsect1>
+</refentry>
+
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: sgml
+sgml-omittag:t
+sgml-shorttag:t
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:2
+sgml-indent-data:t
+sgml-parent-document:nil
+sgml-default-dtd-file:nil
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->
+
+

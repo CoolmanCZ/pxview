@@ -1,0 +1,14 @@
+What is pxlib ?
+---------------
+
+pxlib is shared C library to read various Paradox files. Currently .DB
+files are best supported. pxlib provides a very simple api to read the
+header and the data records of Paradox files. I also provides functions
+to convert the data into the hosts data format (little or big endian).
+
+The complete api is well documented in set of man pages, one for each
+function.
+
+pxlib can be downloaded at http://pxlib.sourceforge.net.
+
+Uwe Steinmann <uwe@steinmann.cx>

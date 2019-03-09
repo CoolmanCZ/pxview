@@ -1,0 +1,23 @@
+LAYOUT(PxViewLayout, 768, 480)
+	ITEM(TabCtrl, tab, HSizePosZ(2, 2).VSizePosZ(2, 22))
+	ITEM(Button, lang, RightPosZ(2, 38).BottomPosZ(2, 18))
+	ITEM(StaticText, numrows, SetFrame(ThinInsetFrame()).LeftPosZ(92, 64).BottomPosZ(1, 19))
+	ITEM(StaticText, numrows_text, LeftPosZ(4, 88).BottomPosZ(1, 19))
+END_LAYOUT
+
+LAYOUT(CharSetLayout, 220, 60)
+	ITEM(Button, cancel, SetLabel(t_("Cancel")).RightPosZ(64, 56).BottomPosZ(8, 20))
+	ITEM(Button, ok, SetLabel(t_("Select")).RightPosZ(4, 56).BottomPosZ(8, 20))
+	ITEM(DropList, d, HSizePosZ(8, 4).TopPosZ(8, 19))
+END_LAYOUT
+
+LAYOUT(HttpSendLayout, 640, 80)
+	ITEM(StaticText, url_text, SetText(t_("HTTPS url:")).SetAlign(ALIGN_RIGHT).LeftPosZ(8, 120).TopPosZ(8, 19))
+	ITEM(EditString, url, HSizePosZ(132, 4).TopPosZ(8, 19))
+	ITEM(StaticText, authorization_text, SetText(t_("Authorization header:")).SetAlign(ALIGN_RIGHT).LeftPosZ(8, 120).TopPosZ(32, 19))
+	ITEM(EditString, authorization, HSizePosZ(132, 4).TopPosZ(32, 19))
+	ITEM(Button, cancel, SetLabel(t_("Cancel")).RightPosZ(64, 56).BottomPosZ(4, 20))
+	ITEM(Button, ok, SetLabel(t_("OK")).RightPosZ(4, 56).BottomPosZ(4, 20))
+	ITEM(Option, checkerror, SetLabel(t_("Don't ignore send errors")).LeftPosZ(8, 500).TopPosZ(56, 20))
+END_LAYOUT
+

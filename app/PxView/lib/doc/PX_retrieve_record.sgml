@@ -1,0 +1,152 @@
+<!doctype refentry PUBLIC "-//OASIS//DTD DocBook V4.1//EN" [
+
+<!-- Process this file with docbook-to-man to generate an nroff manual
+     page: `docbook-to-man manpage.sgml > manpage.1'.  You may view
+     the manual page with: `docbook-to-man manpage.sgml | nroff -man |
+     less'.  A typical entry in a Makefile or Makefile.am is:
+
+manpage.1: manpage.sgml
+	docbook-to-man $< > $@
+
+    
+	The docbook-to-man binary is found in the docbook-to-man package.
+	Please remember that if you create the nroff version in one of the
+	debian/rules file targets (such as build), you will need to include
+	docbook-to-man in your Build-Depends control field.
+
+  -->
+
+  <!-- Fill in your name for FIRSTNAME and SURNAME. -->
+  <!ENTITY dhfirstname "<firstname>UWE</firstname>">
+  <!ENTITY dhsurname   "<surname>STEINMANN</surname>">
+  <!-- Please adjust the date whenever revising the manpage. -->
+  <!ENTITY dhdate      "<date>March 24, 2006</date>">
+  <!-- SECTION should be 1-8, maybe w/ subsection other parameters are
+       allowed: see man(7), man(1). -->
+  <!ENTITY dhsection   "<manvolnum>3</manvolnum>">
+  <!ENTITY dhemail     "<email>uwe@steinmann.cx</email>">
+  <!ENTITY dhusername  "Uwe Steinmann">
+  <!ENTITY dhucpackage "<refentrytitle>PX_RETRIEVE_RECORD</refentrytitle>">
+  <!ENTITY funcname    "PX_retrieve_record">
+
+  <!ENTITY debian      "<productname>Debian</productname>">
+  <!ENTITY gnu         "<acronym>GNU</acronym>">
+  <!ENTITY gpl         "&gnu; <acronym>GPL</acronym>">
+]>
+
+<refentry>
+  <refentryinfo>
+    <address>
+      &dhemail;
+    </address>
+    <author>
+      &dhfirstname;
+      &dhsurname;
+    </author>
+    <copyright>
+      <year>2003-2006</year>
+      <holder>&dhusername;</holder>
+    </copyright>
+    &dhdate;
+  </refentryinfo>
+  <refmeta>
+    &dhucpackage;
+
+    &dhsection;
+  </refmeta>
+  <refnamediv>
+    <refname>&funcname;</refname>
+
+    <refpurpose>Returns record in Paradox file</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <para>#include &lt;paradox.h&gt;</para>
+		<para>pxval_t ** &funcname;(pxdoc_t *pxdoc, int recno)</para>
+  </refsynopsisdiv>
+  <refsect1>
+    <title>DESCRIPTION</title>
+
+    <para>Returns the record with the given number in a Paradox file. The
+		  first record has number 0, the last one has number_of_records-1.</para>
+		<para>If you are accessing several records, do it in ascending order, because
+		  this is the most efficient way.</para>
+		<para>The return value is an array of field values. Each value is stored in
+		  a structure like the following:</para>
+		<programlisting>
+<![CDATA[
+typedef struct px_val pxval_t;
+struct px_val {
+	char isnull;
+	int type;
+	union {
+		long lval;
+		double dval;
+		struct {
+			char *val;
+			int len;
+		} str;
+	} value;
+};
+]]>
+		</programlisting>
+		<para>The element <parameter>isnull</parameter> is set to 1 if the
+		  value is NULL otherwise it is set to 0. <parameter>type</parameter>
+			is the type of the paradox field as defined in
+			<filename>paradox.h</filename>.
+			A field value can be either a long int, a double or a string, depending
+			on the paradox field type. The paradox field types pxfShort, pxfLong,
+			pxfDate, pxfTime, pxfLogical, and pxfAutoInc are returned as long int
+			values.
+			pxfTimestamp, pxfNumber, and pxfCurrency are returned as double values
+			and all remaining paradox field types are stored as strings with the length
+			in <literal>value.len</literal>. You can rely on strings being Null
+			terminated. Blobs are stored as string but are not guarented to be
+			Null terminated.</para>
+		<para>The paradox field types pxfTimestamp, pxfTime, an pxfDate use an
+		  uncommon format which can be converted into a string with
+			<function>PX_timestamp2string(3)</function>,
+			<function>PX_time2string(3)</function>, and
+			<function>PX_date2string(3)</function>.</para>
+
+  </refsect1>
+  <refsect1>
+    <title>RETURN VALUE</title>
+    <para>Returns a pointer on success and NULL on failure.</para>
+  </refsect1>
+  <refsect1>
+    <title>SEE ALSO</title>
+
+    <para>
+			<function>PX_update_record(3)</function>,
+			<function>PX_timestamp2string(3)</function>,
+			<function>PX_time2string(3)</function>,
+		  <function>PX_date2string(3)</function>
+		</para>
+
+  </refsect1>
+  <refsect1>
+    <title>AUTHOR</title>
+
+    <para>This manual page was written by &dhusername; &dhemail;.</para>
+
+  </refsect1>
+</refentry>
+
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: sgml
+sgml-omittag:t
+sgml-shorttag:t
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:2
+sgml-indent-data:t
+sgml-parent-document:nil
+sgml-default-dtd-file:nil
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->
+
+

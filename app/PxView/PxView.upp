@@ -1,0 +1,55 @@
+description "Paradox database viewer\377";
+
+uses
+	Core,
+	GridCtrl,
+	CtrlLib,
+	Sql,
+	Core/SSL;
+
+file
+	"Source files" readonly separator,
+	PxView.cpp,
+	PxRecordView.cpp,
+	PxView.h,
+	PxSession.cpp,
+	PxSession.h,
+	"Resource files" readonly separator,
+	PxView.lay,
+	PxView.t,
+	PxView.iml,
+	PxView.rc,
+	Copying,
+	"Original files" readonly separator,
+	lib/fileformat.h,
+	lib/gregor.c,
+	lib/paradox.c,
+	lib/paradox-gsf.h,
+	lib/paradox.h,
+	lib/paradox-mp.h,
+	lib/px_crypt.c,
+	lib/px_crypt.h,
+	lib/px_encode.c,
+	lib/px_encode.h,
+	lib/px_error.c,
+	lib/px_error.h,
+	lib/px_head.c,
+	lib/px_head.h,
+	lib/px_intern.h,
+	lib/px_io.c,
+	lib/px_io.h,
+	lib/px_memory.c,
+	lib/px_memory.h,
+	lib/px_memprof.c,
+	lib/px_misc.c,
+	lib/px_misc.h,
+	lib/pxversion.h,
+	lib/sdncal.h,
+	lib/AUTHORS,
+	lib/Copying,
+	lib/README,
+	lib/ChangeLog;
+
+mainconfig
+	"" = "GUI";
+
