@@ -10,8 +10,9 @@ uses
 file
 	"Source files" readonly separator,
 	PxView.cpp,
-	PxRecordView.cpp,
 	PxView.h,
+	PxRecordView.cpp,
+	PxRecordView.h,
 	PxSession.cpp,
 	PxSession.h,
 	"Resource files" readonly separator,

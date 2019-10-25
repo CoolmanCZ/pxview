@@ -36,14 +36,15 @@ void px_init_inputencoding(pxdoc_t *pxdoc) {
  */
 int px_set_targetencoding(pxdoc_t *pxdoc) {
 	if(pxdoc->targetencoding) {
-		char buffer[30];
 #if PX_USE_RECODE
+		char buffer[30];
 		if(NULL == pxdoc->out_recode_outer)
 			px_init_targetencoding(pxdoc);
 		sprintf(buffer, "CP%d/CR-LF..%s", pxdoc->px_head->px_doscodepage, pxdoc->targetencoding);
 		recode_scan_request(pxdoc->out_recode_request, buffer);
 #else
 #if PX_USE_ICONV
+		char buffer[30];
 		sprintf(buffer, "CP%d", pxdoc->px_head->px_doscodepage);
 		if(pxdoc->out_iconvcd > 0)
 			iconv_close(pxdoc->out_iconvcd);
@@ -65,12 +66,13 @@ int px_set_targetencoding(pxdoc_t *pxdoc) {
  */
 int px_set_inputencoding(pxdoc_t *pxdoc) {
 	if(pxdoc->inputencoding) {
-		char buffer[30];
 #if PX_USE_RECODE
+		char buffer[30];
 		sprintf(buffer, "%s..CP%d/CR-LF", pxdoc->inputencoding, pxdoc->px_head->px_doscodepage);
 		recode_scan_request(pxdoc->in_recode_request, buffer);
 #else
 #if PX_USE_ICONV
+		char buffer[30];
 		sprintf(buffer, "CP%d", pxdoc->px_head->px_doscodepage);
 		if(pxdoc->in_iconvcd > 0)
 			iconv_close(pxdoc->in_iconvcd);

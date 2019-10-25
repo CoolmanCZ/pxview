@@ -18,6 +18,6 @@ LAYOUT(HttpSendLayout, 640, 80)
 	ITEM(EditString, authorization, HSizePosZ(132, 4).TopPosZ(32, 19))
 	ITEM(Button, cancel, SetLabel(t_("Cancel")).RightPosZ(64, 56).BottomPosZ(4, 20))
 	ITEM(Button, ok, SetLabel(t_("OK")).RightPosZ(4, 56).BottomPosZ(4, 20))
-	ITEM(Option, checkerror, SetLabel(t_("Don't ignore send errors")).LeftPosZ(8, 500).TopPosZ(56, 20))
+	ITEM(Option, checkError, SetLabel(t_("Don't ignore send errors")).LeftPosZ(8, 500).TopPosZ(56, 20))
 END_LAYOUT
 

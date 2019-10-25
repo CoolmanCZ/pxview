@@ -21,14 +21,14 @@ csCZ("Soubory")
 T_("Database")
 csCZ("Datab\303\241ze")
 
-T_("&Open DB file")
-csCZ("&Otev\305\231\303\255t datab\303\241zov\303\275 soubor")
+T_("Open DB file")
+csCZ("Otev\305\231\303\255t datab\303\241zov\303\275 soubor")
 
 T_("Open DB file for view")
 csCZ("Zobraz\303\255 datab\303\241zov\303\275 soubor")
 
-T_("Open &directory")
-csCZ("Otev\305\231\303\255t a&dres\303\241\305\231")
+T_("Open directory")
+csCZ("Otev\305\231\303\255t adres\303\241\305\231")
 
 T_("Open all DB files in the selected directory for view")
 csCZ("Zobrazi v\305\241echny DB soubory ve vybran\303\251m adres\303\241\305\231i")
@@ -40,7 +40,7 @@ T_("Close the currently displayed DB file")
 csCZ("Zav\305\231e aktu\303\241ln\304\233 zobrazen\303\275 datab\303\241zov\303\275 "
      "soubor")
 
-T_("E&xit")
+T_("Exit")
 csCZ("Ukon\304\215it")
 
 T_("Quit the application")
@@ -102,11 +102,11 @@ csCZ("Vyberte adres\303\241\305\231 pro ulo\305\276en\303\255 souboru")
 T_("Select directory to save the files")
 csCZ("Vyberte adres\303\241\305\231 pro ulo\305\276en\303\255 soubor\305\257")
 
+T_("Paradox database viewer")
+csCZ("Prohl\303\255\305\276e\304\215 Paradox datab\303\241ze")
+
 T_("Visible rows:")
 csCZ("Zobrazen\303\251 \305\231\303\241dky:")
-
-T_("DB has been modified!")
-csCZ("Datab\303\241ze byla zm\304\233n\304\233na!")
 
 
 // PxRecordView.cpp
@@ -161,4 +161,3 @@ csCZ("Autoriza\304\215n\303\255 hlavi\304\215ka")
 
 T_("Don't ignore send errors")
 csCZ("Neignorovat chyby p\305\231i pos\303\255l\303\241n\303\255")
-

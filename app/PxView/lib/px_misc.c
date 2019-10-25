@@ -324,7 +324,7 @@ void hex_dump(FILE *outfp, char *p, int len) {
 
 	for(i=0; i<len; i++) {
 		if(i%16 == 0)
-			fprintf(outfp, "\n%08X: ", (int) &p[i]);
+			fprintf(outfp, "\n%p: ", (void *) &p[i]);
 		fprintf(outfp, "%02X ", p[i]);
 	}
 	fprintf(outfp, "\n");

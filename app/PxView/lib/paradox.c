@@ -2465,7 +2465,7 @@ PX_pack(pxdoc_t *pxdoc) {
 	long recordpos, recordoutpos;
 	long blocknumber, blockoutnumber;
 	int recsperblock;
-	int i, j, n, jout, nout;
+	int i, j, jout, nout;
 
 	if(pxdoc == NULL) {
 		px_error(pxdoc, PX_RuntimeError, _("Did not pass a paradox database."));
@@ -3401,8 +3401,7 @@ PX_read_graphicdata(pxblob_t *pxblob, const char *data, int len, int *mod, int *
 PXLIB_API int PXLIB_CALL
 PX_get_data_alpha(pxdoc_t *pxdoc, char *data, int len, char **value) {
 	char *buffer, *obuf = NULL;
-	size_t olen;
-	int res;
+	size_t olen = 0;
 
 	if(data[0] == '\0') {
 		*value = NULL;
@@ -3412,7 +3411,7 @@ PX_get_data_alpha(pxdoc_t *pxdoc, char *data, int len, char **value) {
 	if(pxdoc->targetencoding != NULL) {
 #if PX_USE_RECODE
 		int oallocated = 0;
-		res = recode_buffer_to_buffer(pxdoc->out_recode_request, data, len, &obuf, &olen, &oallocated);
+		int res = recode_buffer_to_buffer(pxdoc->out_recode_request, data, len, &obuf, &olen, &oallocated);
 #else
 #if PX_USE_ICONV
 		size_t ilen;
@@ -3432,7 +3431,8 @@ PX_get_data_alpha(pxdoc_t *pxdoc, char *data, int len, char **value) {
 			ilen++;
 //		printf("data(%d) = '%s'\n", ilen, data);
 //		printf("obuf(%d) = '%s'\n", olen, obuf);
-		if(0 > (res = iconv(pxdoc->out_iconvcd, &iptr, &ilen, &optr, &olen))) {
+		int res = iconv(pxdoc->out_iconvcd, &iptr, &ilen, &optr, &olen);
+		if(0 > res) {
 			*value = NULL;
 			free(obuf);
 			return -1;
@@ -3583,7 +3583,6 @@ PX_get_data_bcd(pxdoc_t *pxdoc, unsigned char *data, int len, char **value) {
 	unsigned char nibble;
 	int size;
 	int lz;   /* 1 as long as leading zeros are found */
-	struct lconv *lc;
 	char *buffer;
 
 	if(data[0] == '\0') {
@@ -3622,7 +3621,7 @@ PX_get_data_bcd(pxdoc_t *pxdoc, unsigned char *data, int len, char **value) {
 	if(lz)
 		buffer[j++] = '0';
 #ifdef HAVE_LOCALE_H
-	lc = localeconv();
+	struct lconv *lc = localeconv();
 	if(lc)
 		buffer[j++] = lc->decimal_point[0];
 	else
@@ -3840,8 +3839,7 @@ PX_get_data_graphic(pxdoc_t *pxdoc, const char *data, int len, int *mod, int *bl
 PXLIB_API void PXLIB_CALL
 PX_put_data_alpha(pxdoc_t *pxdoc, char *data, int len, char *value) {
 	char *obuf = NULL;
-	size_t olen;
-	int res;
+	size_t olen = 0;
 
 	memset(data, 0, len);
 	if((value == NULL) || (value[0] == '\0')) {
@@ -3851,7 +3849,7 @@ PX_put_data_alpha(pxdoc_t *pxdoc, char *data, int len, char *value) {
 	if(pxdoc->targetencoding != NULL) {
 #if PX_USE_RECODE
 		int oallocated = 0;
-		res = recode_buffer_to_buffer(pxdoc->in_recode_request, value, strlen(value), &obuf, &olen, &oallocated);
+		int res = recode_buffer_to_buffer(pxdoc->in_recode_request, value, strlen(value), &obuf, &olen, &oallocated);
 #else
 #if PX_USE_ICONV
 		size_t ilen = strlen(value);
@@ -3865,7 +3863,8 @@ PX_put_data_alpha(pxdoc_t *pxdoc, char *data, int len, char *value) {
 		iptr = value;
 //		printf("value(%d) = '%s'\n", ilen, value);
 //		printf("obuf(%d) = '%s'\n", olen, obuf);
-		if(0 > (res = iconv(pxdoc->in_iconvcd, &iptr, &ilen, &optr, &olen))) {
+		int res = iconv(pxdoc->in_iconvcd, &iptr, &ilen, &optr, &olen);
+		if(0 > res) {
 			memset(data, 0, len);
 			free(obuf);
 			return;
@@ -3985,7 +3984,6 @@ PXLIB_API void PXLIB_CALL
 PX_put_data_bcd(pxdoc_t *pxdoc, char *data, int len, char *value) {
 	unsigned char obuf[17];
 	unsigned char sign;
-	struct lconv *lc;
 	char *dpptr;
 	int i, j;
 
@@ -3998,9 +3996,9 @@ PX_put_data_bcd(pxdoc_t *pxdoc, char *data, int len, char *value) {
 			obuf[0] = 0x40 + (unsigned char) len;
 			sign = 0x0f;
 			memset(obuf+1, 255, 16);
-		} 
+		}
 #ifdef HAVE_LOCALE_H
-		lc = localeconv();
+		struct lconv *lc = localeconv();
 		if(lc)
 			dpptr = strchr(value, lc->decimal_point[0]);
 		else

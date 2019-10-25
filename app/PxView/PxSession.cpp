@@ -4,7 +4,7 @@ using namespace Upp;
 
 ParadoxSession::ParadoxSession() {
 	PX_boot();
-	pxdoc = PX_new2(ErrorHandler, NULL, NULL, NULL);
+	pxdoc = PX_new2(ErrorHandler, nullptr, nullptr, nullptr);
 }
 
 ParadoxSession::~ParadoxSession() {
@@ -18,11 +18,11 @@ bool ParadoxSession::Open(const char *filename) {
 	if (0 == PX_open_file(pxdoc, filepath)) {
 		blobfilepath =
 			AppendFileName(Upp::GetFileDirectory(filename), Upp::GetFileTitle(filename) + ".mb");
-// TODO: check proper work with the blob file
-//		if (FileExists(blobfilepath) && (0 > PX_set_blob_file(pxdoc, blobfilepath))) {
-//			Exclamation(Format("%s: %s", t_("Could not open blob file"), DeQtf(blobfilepath)));
-//			return false;
-//		}
+		// TODO: check proper work with the blob file
+		// if (FileExists(blobfilepath) && (0 > PX_set_blob_file(pxdoc, blobfilepath))) {
+		//	Exclamation(Format("%s: %s", t_("Could not open blob file"), DeQtf(blobfilepath)));
+		//	return false;
+		//}
 		return true;
 	}
 	return false;
@@ -69,6 +69,7 @@ dword ParadoxSession::GetInfoType(char px_ftype) {
 	}
 }
 
+// NOLINTNEXTLINE
 Vector<SqlColumnInfo> ParadoxSession::EnumColumns(String database, String table) {
 	Vector<SqlColumnInfo> out;
 
@@ -82,13 +83,14 @@ Vector<SqlColumnInfo> ParadoxSession::EnumColumns(String database, String table)
 			info.type = GetInfoType(pxf->px_ftype);
 			info.width = pxf->px_flen;
 			out.Add(info);
-			++pxf;
+			++pxf; // NOLINT: C code
 		}
 	}
 
 	return out;
 }
 
+// NOLINTNEXTLINE
 Vector<String> ParadoxSession::EnumTables(String database) {
 	Vector<String> out;
 	out.Add(GetTableName());
@@ -105,14 +107,9 @@ Vector<Value> ParadoxSession::GetRow(int row, byte charset) {
 	int isdeleted = 0; // TODO: allow option to select deleted data
 	int recordsize = PX_get_recordsize(pxdoc);
 
-	char *data;
-	if (NULL == (data = (char *)malloc(recordsize)))
+	StringBuffer data(recordsize);
+	if (nullptr == PX_get_record2(pxdoc, row, data, &isdeleted, &pxdbinfo))
 		return record;
-
-	if (NULL == PX_get_record2(pxdoc, row, data, &isdeleted, &pxdbinfo)) {
-		free(data);
-		return record;
-	}
 
 	int offset = 0;
 	pxfield_t *pxf = PX_get_fields(pxdoc);
@@ -220,9 +217,7 @@ Vector<Value> ParadoxSession::GetRow(int row, byte charset) {
 
 			if ((ret > 0) && (blobdata)) {
 				if (pxf->px_ftype == pxfFmtMemoBLOb || pxf->px_ftype == pxfMemoBLOb) {
-					String out;
-					for (int i = 0; i < size; ++i)
-						out += blobdata[i];
+					String out(blobdata, size);
 					val = Upp::ToUnicode(out, codepage);
 				} else {
 					String blobprefix = GetTableName();
@@ -257,9 +252,8 @@ Vector<Value> ParadoxSession::GetRow(int row, byte charset) {
 			break;
 		}
 		offset += pxf->px_flen;
-		++pxf;
+		++pxf; // NOLINT: C code
 	}
-	free(data);
 	return record;
 }
 
@@ -271,25 +265,19 @@ bool ParadoxSession::DelRow(int row) {
 	int isdeleted = 0;
 	int recordsize = PX_get_recordsize(pxdoc);
 
-	char *data;
-	if (NULL == (data = (char *)malloc(recordsize)))
+	StringBuffer data(recordsize);
+	if (nullptr == PX_get_record2(pxdoc, row, data, &isdeleted, &pxdbinfo))
 		return false;
-
-	if (NULL == PX_get_record2(pxdoc, row, data, &isdeleted, &pxdbinfo)) {
-		free(data);
-		return false;
-	}
 
 	bool result = false;
 	int ret = PX_delete_record(pxdoc, row);
 	if (ret > -1)
 		result = true;
 
-	free(data);
 	return result;
 }
 
-bool ParadoxSession::SetRowCol(int row, int col, Value value) {
+bool ParadoxSession::SetRowCol(int row, int col, const Value &value) {
 	if (col >= PX_get_num_fields(pxdoc) || row < 0 || row > GetNumRecords())
 		return false;
 
@@ -297,14 +285,10 @@ bool ParadoxSession::SetRowCol(int row, int col, Value value) {
 	int isdeleted = 0;
 	int recordsize = PX_get_recordsize(pxdoc);
 
-	char *data;
-	if (NULL == (data = (char *)malloc(recordsize)))
-		return false;
+	StringBuffer data(recordsize);
 
-	if (NULL == PX_get_record2(pxdoc, row, data, &isdeleted, &pxdbinfo)) {
-		free(data);
+	if (nullptr == PX_get_record2(pxdoc, row, data, &isdeleted, &pxdbinfo))
 		return false;
-	}
 
 	bool result = false;
 	int offset = 0;
@@ -314,7 +298,7 @@ bool ParadoxSession::SetRowCol(int row, int col, Value value) {
 	for (int i = 0; i < PX_get_num_fields(pxdoc); ++i) {
 		if (i < col) {
 			offset += pxf->px_flen;
-			++pxf;
+			++pxf; // NOLINT: C code
 			continue;
 		}
 		if (i > col)
@@ -420,13 +404,12 @@ bool ParadoxSession::SetRowCol(int row, int col, Value value) {
 			break;
 		}
 		offset += pxf->px_flen;
-		++pxf;
+		++pxf; // NOLINT: C code
 	}
 
 	if (PX_put_recordn(pxdoc, data, row) > -1)
 		result = true;
 
-	free(data);
 	return result;
 }
 

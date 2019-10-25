@@ -11,37 +11,29 @@ GUI_APP_MAIN { PxView().Sizeable().Zoomable().Run(); }
 PxView::PxView() {
 	Icon(PxViewImg::AppLogo());
 
-	m_version = "v1.0.0";
+	version = "v1.1.0";
 
 	CtrlLayout(*this);
 	this->WhenClose = THISBACK(Exit);
 
-	AddFrame(menubar);
-	AddFrame(statusbar);
+	AddFrame(menuBar);
+	AddFrame(statusBar);
 
 	tab.WhenSet = THISBACK(CountRows);
 	lang.WhenPush = THISBACK(ToggleLang);
 
-	file.Type(t_("table files (*.db)"), "*.db")
+	fileSel.Type(t_("table files (*.db)"), "*.db")
 		.Type(t_("index information files (*.px, *.x*, *.y*)"), "*.px, *.x*, *.y*")
 		.Type(t_("all files"), "*")
 		.ActiveDir(GetHomeDirectory());
 
-	filepattern = "*.db;*.px;*.x*;*.y*";
+	filePattern = "*.db;*.px;*.x*;*.y*";
 
-	m_current_lang = GetCurrentLanguage();
+	currentLang = GetCurrentLanguage();
 	ToggleLang();
 
-	statusbar.SetDefault("");
-	statusbar = "";
-}
-
-PxView::~PxView() {
-	for (int i = 0; i < tab.GetCount(); ++i) {
-		TabCtrl::Item &myTab = tab.GetItem(i);
-		PxRecordView *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
-		delete (px);
-	}
+	statusBar.SetDefault("");
+	statusBar = "";
 }
 
 void PxView::Exit() {
@@ -50,8 +42,8 @@ void PxView::Exit() {
 }
 
 void PxView::MakeMenu() {
-	menubar.Set(THISBACK(MenuMain));
-	menubar.WhenHelp = statusbar;
+	menuBar.Set(THISBACK(MenuMain));
+	menuBar.WhenHelp = statusBar;
 }
 
 void PxView::MenuMain(Bar &menu) {
@@ -62,16 +54,16 @@ void PxView::MenuMain(Bar &menu) {
 void PxView::MenuFile(Bar &menu) {
 	bool enable = tab.GetCount();
 
-	menu.Add(t_("&Open DB file"), CtrlImg::open(), THISBACK(OpenFile))
+	menu.Add(t_("Open DB file"), CtrlImg::open(), THISBACK(OpenFile))
 		.Key(K_CTRL_O)
 		.Help(t_("Open DB file for view"));
-	menu.Add(t_("Open &directory"), CtrlImg::open(), THISBACK(OpenDirectory))
+	menu.Add(t_("Open directory"), CtrlImg::open(), THISBACK(OpenDirectory))
 		.Key(K_CTRL_D)
 		.Help(t_("Open all DB files in the selected directory for view"));
 	menu.Add(enable, t_("Close DB file"), CtrlImg::open(), THISBACK(RemoveTab))
 		.Key(K_CTRL_Q)
 		.Help(t_("Close the currently displayed DB file"));
-	menu.Add(t_("E&xit"), THISBACK(Exit)).Key(K_CTRL_X).Help(t_("Quit the application"));
+	menu.Add(t_("Exit"), THISBACK(Exit)).Key(K_CTRL_X).Help(t_("Quit the application"));
 }
 
 void PxView::MenuDB(Bar &menu) {
@@ -98,166 +90,193 @@ void PxView::MenuDB(Bar &menu) {
 }
 
 void PxView::OpenFile() {
-	if (!file.ExecuteOpen(t_("Select file to open")))
+	if (!fileSel.ExecuteOpen(t_("Select file to open")))
 		return;
 
-	String filename = file.Get();
-	if (PatternMatchMulti(filepattern, Upp::GetFileName(filename)))
-		LoadFile(filename);
+	String filePath = fileSel.Get();
+	if (PatternMatchMulti(filePattern, Upp::GetFileName(filePath)))
+		LoadFile(filePath);
 }
 
 void PxView::OpenDirectory() {
-	file.ClearFiles();
-	if (!file.ExecuteSelectDir(t_("Select directory to open files")))
+	fileSel.ClearFiles();
+	if (!fileSel.ExecuteSelectDir(t_("Select directory to open files")))
 		return;
 
-	String path = AppendFileName(file.Get(), "*");
+	String path = AppendFileName(fileSel.Get(), "*");
 
 	for (FindFile ff(path); ff; ff.Next()) {
 		if (ff.IsFile()) {
-			String filename = ff.GetPath();
-			if (PatternMatchMulti(filepattern, Upp::GetFileName(filename)))
-				LoadFile(filename);
+			String filePath = ff.GetPath();
+			if (PatternMatchMulti(filePattern, Upp::GetFileName(filePath)))
+				LoadFile(filePath);
 		}
 		Ctrl::ProcessEvents();
 	}
 }
 
-void PxView::LoadFile(const String &filename) {
+void PxView::LoadFile(const String &filePath) {
 	for (int i = 0; i < tab.GetCount(); ++i) {
 		TabCtrl::Item &myTab = tab.GetItem(i);
-		PxRecordView *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
-		if (px && filename.Compare(px->GetFilePath()) == 0) {
+		auto *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
+		if (px && px->GetFilePath().IsEqual(filePath)) {
 			tab.Set(i);
 			return;
 		}
 	}
 
-	PxRecordView *px = new PxRecordView();
-	if (px->OpenDB(filename)) {
+	PxRecordView *px = GetPxRecordView(filePath);
+	if (px) {
 		tab.Add(px->SizePos(), px->GetFileName());
 		tab.Set(tab.GetCount() - 1);
 		px->WhenRemoveTab = THISBACK(RemoveTab);
 		px->WhenSearchCursor = THISBACK(CountRows);
-	} else {
-		delete (px);
 	}
 }
 
 void PxView::ShowInfo() {
-	int curtab = tab.Get();
-	TabCtrl::Item &myTab = tab.GetItem(curtab);
-	PxRecordView *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
+	int curTab = tab.Get();
+	TabCtrl::Item &myTab = tab.GetItem(curTab);
+	auto *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
 	if (px)
 		px->ShowInfo();
 }
 
 void PxView::ChangeCharset() {
-	int curtab = tab.Get();
-	TabCtrl::Item &myTab = tab.GetItem(curtab);
-	PxRecordView *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
+	int curTab = tab.Get();
+	TabCtrl::Item &myTab = tab.GetItem(curTab);
+	auto *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
 	if (px)
 		px->ChangeCharset();
 }
 
 void PxView::DeleteRow() {
-	int curtab = tab.Get();
-	TabCtrl::Item &myTab = tab.GetItem(curtab);
-	PxRecordView *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
+	int curTab = tab.Get();
+	TabCtrl::Item &myTab = tab.GetItem(curTab);
+	auto *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
 	if (px)
 		px->DeleteRow();
 }
 
-void PxView::SaveAs(const int filetype) {
-	file.ClearFiles();
-	if (!file.ExecuteSelectDir(t_("Select directory to save the file")))
+void PxView::SaveAs(const int fileType) {
+	fileSel.ClearFiles();
+	if (!fileSel.ExecuteSelectDir(t_("Select directory to save the file")))
 		return;
 
-	int curtab = tab.Get();
-	TabCtrl::Item &myTab = tab.GetItem(curtab);
-	PxRecordView *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
+	int curTab = tab.Get();
+	TabCtrl::Item &myTab = tab.GetItem(curTab);
+	auto *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
 	if (px) {
-		if (filetype == csv)
-			px->SaveAsCsv(file.Get());
+		if (fileType == csv)
+			px->SaveAsCsv(fileSel.Get());
 		else
-			px->SaveAsJson(file.Get());
+			px->SaveAsJson(fileSel.Get());
 	}
 }
 
-void PxView::SaveAllAs(const int filetype) {
-	file.ClearFiles();
-	if (!file.ExecuteSelectDir(t_("Select directory to save the files")))
+void PxView::SaveAllAs(const int fileType) {
+	fileSel.ClearFiles();
+	if (!fileSel.ExecuteSelectDir(t_("Select directory to save the files")))
 		return;
 
 	for (int i = 0; i < tab.GetCount(); ++i) {
 		TabCtrl::Item &myTab = tab.GetItem(i);
-		PxRecordView *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
+		auto *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
 		if (px) {
-			if (filetype == csv)
-				px->SaveAsCsv(file.Get());
+			if (fileType == csv)
+				px->SaveAsCsv(fileSel.Get());
 			else
-				px->SaveAsJson(file.Get());
+				px->SaveAsJson(fileSel.Get());
 		}
 	}
 }
 
 void PxView::ExportJson() {
-	int curtab = tab.Get();
-	TabCtrl::Item &myTab = tab.GetItem(curtab);
-	PxRecordView *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
+	int curTab = tab.Get();
+	TabCtrl::Item &myTab = tab.GetItem(curTab);
+	auto *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
 	if (px)
 		px->ExportJson();
 }
 
 void PxView::ExportAllJson() {
-	int curtab = tab.Get();
-	TabCtrl::Item &myTab = tab.GetItem(curtab);
-	PxRecordView *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
+	int curTab = tab.Get();
+	TabCtrl::Item &myTab = tab.GetItem(curTab);
+	auto *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
 	if (px)
 		px->ExportAllJson();
 }
 
 void PxView::ToggleLang() {
-	Size lang_size = lang.GetSize();
+	Size langSize = lang.GetSize();
 
-	if (m_current_lang == LNG_('C', 'S', 'C', 'Z')) {
-		m_current_lang = LNG_('E', 'N', 'U', 'S');
-		lang.SetImage(Rescale(PxViewImg::cz(), lang_size.cx, lang_size.cy));
+	if (currentLang == LNG_('C', 'S', 'C', 'Z')) {
+		currentLang = LNG_('E', 'N', 'U', 'S');
+		lang.SetImage(Rescale(PxViewImg::cz(), langSize));
 	} else {
-		m_current_lang = LNG_('C', 'S', 'C', 'Z');
-		lang.SetImage(Rescale(PxViewImg::gb(), lang_size.cx, lang_size.cy));
+		currentLang = LNG_('C', 'S', 'C', 'Z');
+		lang.SetImage(Rescale(PxViewImg::gb(), langSize));
 	}
-	SetLanguage(m_current_lang);
+	SetLanguage(currentLang);
 
-	Title(Format("%s - %s", t_("Paradox database viewer"), m_version));
+	Title(Format("%s - %s", t_("Paradox database viewer"), version));
 	numrows_text.SetText(t_("Visible rows:"));
 
 	MakeMenu();
 }
 
 void PxView::RemoveTab() {
-	int curtab = tab.Get();
-	TabCtrl::Item &myTab = tab.GetItem(curtab);
-	PxRecordView *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
-	if (px) {
-		if (px->IsModified())
-			Exclamation(t_("DB has been modified!"));
-		delete (px);
-	}
+	int curTab = tab.Get();
+	TabCtrl::Item &myTab = tab.GetItem(curTab);
+	auto *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
+	if (px)
+		RemovePxRecordView(px->GetFilePath());
 
-	tab.Remove(curtab);
+	tab.Remove(curTab);
 }
 
 void PxView::CountRows() {
-	int curtab = tab.Get();
+	int curTab = tab.Get();
 	int rows = 0;
-	if (curtab > -1) {
-		TabCtrl::Item &myTab = tab.GetItem(curtab);
-		PxRecordView *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
+	if (curTab > -1) {
+		TabCtrl::Item &myTab = tab.GetItem(curTab);
+		auto *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
 		if (px)
 			rows = px->GetCountRows();
 	}
 	numrows.SetText(AsString(rows));
 }
+
+int PxView::FindPxRecordView(const Upp::String &filePath) {
+	int index = -1;
+	for (int i = 0; i < pxArray.GetCount(); ++i) {
+		if (pxArray[i].GetFilePath().IsEqual(filePath)) {
+			index = i;
+			break;
+		}
+	}
+
+	return index;
+}
+
+void PxView::RemovePxRecordView(const Upp::String &filePath) {
+	int index = FindPxRecordView(filePath);
+	if (index != -1) {
+		pxArray.Remove(index);
+		pxArray.Shrink();
+	}
+};
+
+PxRecordView *PxView::GetPxRecordView(const Upp::String &filePath) {
+	int index = FindPxRecordView(filePath);
+	if (index == -1) {
+		pxArray.Create<PxRecordView>().OpenDB(filePath);
+		index = FindPxRecordView(filePath);
+	}
+	if (index > -1 && index < pxArray.GetCount())
+		return &pxArray[index];
+
+	return nullptr;
+};
 
 // vim: ts=4

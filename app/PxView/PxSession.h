@@ -22,8 +22,10 @@ static const char *pxfiletypename[] = {"indexed .DB data file",
 namespace Upp {
 
 class ParadoxSession {
-
   public:
+	ParadoxSession();
+	virtual ~ParadoxSession();
+
 	virtual bool IsOpen() const {
 		return NULL != pxdoc->px_stream ||
 			   (NULL != pxdoc->px_blob && NULL != pxdoc->px_blob->mb_stream);
@@ -151,15 +153,12 @@ class ParadoxSession {
 
 	Vector<Value> GetRow(int row, byte charset = 0);
 	bool DelRow(int row);
-	bool SetRowCol(int row, int col, Value value);
+	bool SetRowCol(int row, int col, const Value &value);
 
 	operator pxdoc_t *() { return pxdoc; }
-
-	ParadoxSession();
-	virtual ~ParadoxSession();
 };
-}
 
+} // namespace Upp
 #endif
 
 // vim: ts=4

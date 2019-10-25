@@ -8,15 +8,16 @@ PxRecordView::PxRecordView() {
 	WhenMenuBar = THISBACK(StatusMenuBar);
 	WhenEnter = WhenLeftDouble = THISBACK(EditData);
 
-	http_client.MaxContentSize(INT_MAX);
-	http_client.WhenContent = THISBACK(HttpContent);
-	http_client.WhenWait = http_client.WhenDo = THISBACK(HttpShowProgress);
-	http_client.WhenStart = THISBACK(HttpStart);
+	httpClient.MaxContentSize(INT_MAX);
+	httpClient.WhenContent = THISBACK(HttpContent);
+	httpClient.WhenWait = httpClient.WhenDo = THISBACK(HttpShowProgress);
+	httpClient.WhenStart = THISBACK(HttpStart);
 
-	http_file_name = "https_received_data.txt";
-	http_error_log_path =
-		AppendFileName(Nvl(GetDownloadFolder(), GetHomeDirFile("downloads")), "https_error_log.txt");
-	http_pi_text = t_("HTTPS data transfer");
+	httpLoaded = 0;
+	httpFileName = "https_received_data.txt";
+	httpErrorLogPath = AppendFileName(Nvl(GetDownloadFolder(), GetHomeDirFile("downloads")),
+									  "https_error_log.txt");
+	httpPIText = t_("HTTPS data transfer");
 
 	Absolute()
 		.Editing()
@@ -47,13 +48,13 @@ void PxRecordView::StatusMenuBar(Bar &bar) {
 	bar.Add(t_("Send ALL rows using HTTPS (application/json)"), THISBACK(ExportAllJson));
 }
 
-bool PxRecordView::OpenDB(const String &filename) {
-	bool result = px.Open(filename);
+bool PxRecordView::OpenDB(const String &filePath) {
+	bool result = px.Open(filePath);
 
 	if (result)
 		ReadRecords();
 	else
-		Exclamation(Format("%s: %s", t_("Error during processing the file"), DeQtf(filename)));
+		Exclamation(Format("%s: %s", t_("Error during processing the file"), DeQtf(filePath)));
 
 	return result;
 }
@@ -62,7 +63,7 @@ void PxRecordView::ReadRecords(byte charset) {
 	Ready(false);
 	Clear(true);
 
-	Vector<SqlColumnInfo> columns = px.EnumColumns(NULL, NULL);
+	Vector<SqlColumnInfo> columns = px.EnumColumns(nullptr, nullptr);
 	for (int i = 0; i < columns.GetCount(); ++i)
 		AddColumn(static_cast<Id>(columns[i].name), columns[i].name);
 
@@ -88,8 +89,8 @@ void PxRecordView::ChangeCharset() {
 	dlg.ok <<= dlg.Breaker(IDOK);
 
 	if (dlg.Run() == IDOK) {
-		String charsetname = dlg.d.GetValue();
-		ReadRecords(CharsetByName(charsetname));
+		String charsetName = dlg.d.GetValue();
+		ReadRecords(CharsetByName(charsetName));
 	}
 }
 
@@ -151,9 +152,9 @@ void PxRecordView::EditData() {
 	c->SetData(data);
 
 	if (editcolumn.Execute() == IDOK) {
-		Value newdata = c->GetData();
-		if (data != newdata && px.SetRowCol(row, col, newdata)) {
-			Set(row, col, newdata);
+		Value newData = c->GetData();
+		if (data != newData && px.SetRowCol(row, col, newData)) {
+			Set(row, col, newData);
 			modified = true;
 		}
 	}
@@ -239,17 +240,16 @@ String PxRecordView::AsText(String (*format)(const Value &), const char *tab, co
 	return txt;
 }
 
-static String sCsvString(const String& text)
-{
+static String sCsvString(const String &text) {
 	String r;
 	r << '\"';
 	const char *s = text;
-	while(*s) {
-		if(*s == '\"')
+	while (*s) {
+		if (*s == '\"')
 			r << "\\\"";
 		else
 			r.Cat(*s);
-		s++;
+		s++; // NOLINT: C code
 	}
 	r << '\"';
 	return r;
@@ -260,8 +260,9 @@ static String sCsvFormat(const Value &v) {
 }
 
 String PxRecordView::AsCsv(int sep, bool hdr) {
-	char h[2] = {(char)sep, 0};
-	return AsText(sCsvFormat, h, "\r\n", hdr ? h : NULL, "\r\n");
+	String h(0, 2);
+	h.Set(0, sep);
+	return AsText(sCsvFormat, h, "\r\n", hdr ? h : nullptr, "\r\n");
 }
 
 String PxRecordView::AsJson() {
@@ -299,146 +300,145 @@ void PxRecordView::SaveAs(const int filetype) {
 		SaveAsJson(file.Get());
 }
 
-void PxRecordView::SaveAsCsv(const String &dirpath) {
-	String filename = px.GetFileName() + ".csv";
-	String filepath = AppendFileName(dirpath, filename);
-	if (!SaveFile(filepath, AsCsv()))
+void PxRecordView::SaveAsCsv(const String &dirPath) {
+	String fileName = px.GetFileName() + ".csv";
+	String filePath = AppendFileName(dirPath, fileName);
+	if (!SaveFile(filePath, AsCsv()))
 		Exclamation("Error saving the CSV file");
 	else
 		Exclamation("Successfully saved the CSV file");
 }
 
-void PxRecordView::SaveAsJson(const String &dirpath) {
-	String filename = px.GetFileName() + ".json";
-	String filepath = AppendFileName(dirpath, filename);
-	if (!SaveFile(filepath, AsJson()))
+void PxRecordView::SaveAsJson(const String &dirPath) {
+	String fileName = px.GetFileName() + ".json";
+	String filePath = AppendFileName(dirPath, fileName);
+	if (!SaveFile(filePath, AsJson()))
 		Exclamation("Error saving the JSON file");
 	else
 		Exclamation("Successfully saved the JSON file");
 }
 
-void PxRecordView::GetUrl(bool &upload, String &url, String &auth, bool &checkerror) {
+void PxRecordView::GetUrl(bool &upload, String &url, String &auth, bool &checkError) {
 	WithHttpSendLayout<TopWindow> ctrl;
 	CtrlLayout(ctrl, t_("HTTPS data transfer"));
 
 	ctrl.Acceptor(ctrl.ok, IDOK);
 	ctrl.Rejector(ctrl.cancel, IDCANCEL);
 	ctrl.WhenClose = ctrl.Rejector(IDCANCEL);
-	ctrl.checkerror <<= 1;
+	ctrl.checkError <<= 1;
 
-	ctrl.url.NullText(
-		"https://restapi.example.com/app/site/hosting/restlet.nl?script=11&deploy=1");
+	ctrl.url.NullText("https://restapi.example.com/app/site/hosting/restlet.nl?script=11&deploy=1");
 	ctrl.authorization.NullText("NLAuth nlauth_account=123456, nlauth_email=somobody@email.com, "
-							   "nlauth_signature=xxxxxxxx, nlauth_role=41");
+								"nlauth_signature=xxxxxxxx, nlauth_role=41");
 
 	upload = false;
 	if (ctrl.Execute() == IDOK) {
 		url = ctrl.url.GetData();
 		auth = ctrl.authorization.GetData();
-		checkerror = ctrl.checkerror.GetData();
+		checkError = ctrl.checkError.GetData();
 		upload = true;
 	}
 }
 
-int PxRecordView::SendData(Json data, const String &url, const String &auth, bool &checkerror) {
+int PxRecordView::SendData(const Json &data, const String &url, const String &auth,
+						   bool &checkError) {
 	int result = IDOK;
 
-	http_path =
-		AppendFileName(Nvl(GetDownloadFolder(), GetHomeDirFile("downloads")), http_file_name);
-	http_pi.Reset();
+	httpPath = AppendFileName(Nvl(GetDownloadFolder(), GetHomeDirFile("downloads")), httpFileName);
+	httpPI.Reset();
 
-	http_client.New();
-	http_client.Authorization(auth);
-	http_client.ContentType("application/json");
-	http_client.Post(data);
-	http_client.Url(url).Execute();
+	httpClient.New();
+	httpClient.Authorization(auth);
+	httpClient.ContentType("application/json");
+	httpClient.Post(data);
+	httpClient.Url(url).Execute();
 
-	if (http_out.IsOpen())
-		http_out.Close();
+	if (httpOut.IsOpen())
+		httpOut.Close();
 
-	if (!http_client.IsSuccess()) {
-		DeleteFile(http_path);
+	if (!httpClient.IsSuccess()) {
+		DeleteFile(httpPath);
 		String error_msg = " => Sending data has failed.&\1" +
-						   (http_client.IsError() ? http_client.GetErrorDesc()
-												  : AsString(http_client.GetStatusCode()) + ' ' +
-														http_client.GetReasonPhrase());
+						   (httpClient.IsError() ? httpClient.GetErrorDesc()
+												 : AsString(httpClient.GetStatusCode()) + ' ' +
+													   httpClient.GetReasonPhrase());
 
-		http_error_log.Open(http_error_log_path);
-		http_error_log.Put(data.ToString());
-		http_error_log.Put(error_msg);
-		http_error_log.Put("\n");
-		http_error_log.Flush();
-		if (checkerror)
+		httpErrorLog.Open(httpErrorLogPath);
+		httpErrorLog.Put(data.ToString());
+		httpErrorLog.Put(error_msg);
+		httpErrorLog.Put("\n");
+		httpErrorLog.Flush();
+		if (checkError)
 			Exclamation(error_msg);
 		result = IDCANCEL;
 	}
 
-	if (http_client.IsAbort())
-		checkerror = true;
+	if (httpClient.IsAbort())
+		checkError = true;
 
 	return result;
 }
 
 void PxRecordView::ExportJson() {
-	bool upload, checkerror;
+	bool upload, checkError;
 	String url, authorization;
-	GetUrl(upload, url, authorization, checkerror);
+	GetUrl(upload, url, authorization, checkError);
 
-	if (FileExists(http_error_log_path))
-		DeleteFile(http_error_log_path);
+	if (FileExists(httpErrorLogPath))
+		DeleteFile(httpErrorLogPath);
 
 	if (upload) {
-		http_pi_text = t_("HTTPS data transfer");
-		SendData(GetJson(), url, authorization, checkerror);
+		httpPIText = t_("HTTPS data transfer");
+		SendData(GetJson(), url, authorization, checkError);
 	}
 }
 
 void PxRecordView::ExportAllJson() {
-	bool upload, checkerror;
+	bool upload, checkError;
 	String url, authorization;
-	GetUrl(upload, url, authorization, checkerror);
+	GetUrl(upload, url, authorization, checkError);
 
-	if (FileExists(http_error_log_path))
-		DeleteFile(http_error_log_path);
+	if (FileExists(httpErrorLogPath))
+		DeleteFile(httpErrorLogPath);
 
 	if (upload) {
 		for (int i = 0; i < GetCount(); ++i) {
-			http_pi_text = Format(t_("HTTPS data transfer: %d/%d"), i + 1, GetCount());
+			httpPIText = Format(t_("HTTPS data transfer: %d/%d"), i + 1, GetCount());
 			Json data = GetJson(i);
-			if ((SendData(data, url, authorization, checkerror) != IDOK) && (checkerror))
+			if ((SendData(data, url, authorization, checkError) != IDOK) && (checkError))
 				break;
 		}
 	}
 }
 
 void PxRecordView::HttpStart() {
-	if (http_out.IsOpen()) {
-		http_out.Close();
-		DeleteFile(http_path);
+	if (httpOut.IsOpen()) {
+		httpOut.Close();
+		DeleteFile(httpPath);
 	}
-	http_loaded = 0;
+	httpLoaded = 0;
 }
 
 void PxRecordView::HttpContent(const void *ptr, int size) {
-	http_loaded += size;
-	if (!http_out.IsOpen()) {
-		RealizePath(http_path);
-		http_out.Open(http_path);
+	httpLoaded += size;
+	if (!httpOut.IsOpen()) {
+		RealizePath(httpPath);
+		httpOut.Open(httpPath);
 	}
-	http_out.Put(ptr, size);
+	httpOut.Put(ptr, size);
 }
 
 void PxRecordView::HttpShowProgress() {
-	if (http_client.GetContentLength() >= 0) {
-		http_pi.SetText(http_pi_text);
-		http_pi.Set((int)http_loaded, (int)http_client.GetContentLength());
+	if (httpClient.GetContentLength() >= 0) {
+		httpPI.SetText(httpPIText);
+		httpPI.Set((int)httpLoaded, (int)httpClient.GetContentLength());
 	} else {
-		http_pi.Set(0, 0);
-		http_pi.SetText(http_client.GetPhaseName());
+		httpPI.Set(0, 0);
+		httpPI.SetText(httpClient.GetPhaseName());
 	}
 
-	if (http_pi.Canceled())
-		http_client.Abort();
+	if (httpPI.Canceled())
+		httpClient.Abort();
 }
 
 // vim: ts=4
