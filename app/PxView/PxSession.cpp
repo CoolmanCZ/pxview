@@ -240,6 +240,7 @@ Vector<Value> ParadoxSession::GetRow(int row, byte charset) {
 		}
 		case pxfBCD: {
 			char *value;
+			// NOLINTNEXTLINE: C code
 			if (0 < PX_get_data_bcd(pxdoc, (unsigned char *)&data[offset], pxf->px_fdc, &value)) {
 				val = value;
 				pxdoc->free(pxdoc, value);

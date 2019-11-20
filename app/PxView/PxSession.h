@@ -1,5 +1,5 @@
-#ifndef _plugin_pxview_h_
-#define _plugin_pxview_h_
+#ifndef _PxView_PxSessionView_h_
+#define _PxView_PxSessionView_h_
 
 #include <CtrlLib/CtrlLib.h>
 #include <Sql/Sql.h>

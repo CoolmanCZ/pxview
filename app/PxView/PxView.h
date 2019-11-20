@@ -5,10 +5,10 @@
 
 #include "PxRecordView.h"
 
-using namespace Upp;
-
+namespace Upp {
 #define LAYOUTFILE <PxView/PxView.lay>
 #include <CtrlCore/lay.h>
+} // namespace Upp
 
 #define TFILE <PxView/PxView.t>
 #include <Core/t.h>
@@ -17,7 +17,7 @@ using namespace Upp;
 #define IMAGEFILE <PxView/PxView.iml>
 #include <Draw/iml_header.h>
 
-class PxView : public WithPxViewLayout<Upp::TopWindow> {
+class PxView : public Upp::WithPxViewLayout<Upp::TopWindow> {
   public:
 	typedef PxView CLASSNAME;
 	PxView();
@@ -28,8 +28,6 @@ class PxView : public WithPxViewLayout<Upp::TopWindow> {
 	void DeleteRow();
 	void ExportJson();
 	void ExportAllJson();
-
-	//	void HttpExport();
 
   private:
 	Upp::Array<PxRecordView> pxArray;

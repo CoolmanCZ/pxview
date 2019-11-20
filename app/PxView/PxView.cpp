@@ -11,7 +11,7 @@ GUI_APP_MAIN { PxView().Sizeable().Zoomable().Run(); }
 PxView::PxView() {
 	Icon(PxViewImg::AppLogo());
 
-	version = "v1.1.0";
+	version = "v1.1.1";
 
 	CtrlLayout(*this);
 	this->WhenClose = THISBACK(Exit);
