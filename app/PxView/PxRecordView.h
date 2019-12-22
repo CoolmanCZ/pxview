@@ -49,6 +49,7 @@ class PxRecordView : public Upp::GridCtrl {
 	virtual bool IsModified() const { return modified; }
 
 	bool OpenDB(const Upp::String &filePath);
+	bool IsDBOpen() { return px.IsOpen(); }
 	void ShowInfo();
 	void ChangeCharset();
 	void DeleteRow();

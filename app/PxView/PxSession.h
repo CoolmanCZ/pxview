@@ -8,17 +8,6 @@ extern "C" {
 #include "lib/paradox.h"
 }
 
-static const char *pxfiletypename[] = {"indexed .DB data file",
-									   "primary index .PX file",
-									   "non-indexed .DB data file",
-									   "non-incrementing secondary index .Xnn file",
-									   "secondary index .Ynn file (inc or non-inc)",
-									   "incrementing secondary index .Xnn file",
-									   "non-incrementing secondary index .XGn file",
-									   "secondary index .YGn file (inc or non inc)",
-									   "incrementing secondary index .XGn file",
-									   "Unknown file type"};
-
 namespace Upp {
 
 class ParadoxSession {
@@ -27,8 +16,8 @@ class ParadoxSession {
 	virtual ~ParadoxSession();
 
 	virtual bool IsOpen() const {
-		return NULL != pxdoc->px_stream ||
-			   (NULL != pxdoc->px_blob && NULL != pxdoc->px_blob->mb_stream);
+		return open && (NULL != pxdoc->px_stream ||
+						(NULL != pxdoc->px_blob && NULL != pxdoc->px_blob->mb_stream));
 	}
 
 	virtual Vector<String> EnumUsers() {
@@ -55,6 +44,7 @@ class ParadoxSession {
   private:
 	pxdoc_t *pxdoc;
 
+	bool open;
 	String filepath;
 	String blobfilepath;
 
@@ -131,7 +121,7 @@ class ParadoxSession {
 		return (int)number;
 	}
 
-	String GetFileTypeName() const { return pxfiletypename[GetFileType()]; }
+	String GetFileTypeName() const;
 	String GetCharsetName() const { return Format("%s%d", "cp", GetCodepage()); }
 	String GetUpdateTime() const {
 		return Upp::Format(Upp::TimeFromUTC(pxdoc->px_head->px_fileupdatetime));

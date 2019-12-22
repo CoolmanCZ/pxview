@@ -11,7 +11,7 @@ GUI_APP_MAIN { PxView().Sizeable().Zoomable().Run(); }
 PxView::PxView() {
 	Icon(PxViewImg::AppLogo());
 
-	version = "v1.1.1";
+	version = "v1.1.2";
 
 	CtrlLayout(*this);
 	this->WhenClose = THISBACK(Exit);
@@ -67,7 +67,15 @@ void PxView::MenuFile(Bar &menu) {
 }
 
 void PxView::MenuDB(Bar &menu) {
-	bool enable = tab.GetCount();
+	bool enable = false;
+
+	if (tab.GetCount()) {
+		int curTab = tab.Get();
+		TabCtrl::Item &myTab = tab.GetItem(curTab);
+		auto *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
+		if (px && px->IsDBOpen())
+			enable = true;
+	}
 
 	menu.Add(enable, t_("Show DB info"), THISBACK(ShowInfo));
 	menu.Separator();

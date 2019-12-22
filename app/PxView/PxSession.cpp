@@ -3,6 +3,7 @@
 using namespace Upp;
 
 ParadoxSession::ParadoxSession() {
+	open = false;
 	PX_boot();
 	pxdoc = PX_new2(ErrorHandler, nullptr, nullptr, nullptr);
 }
@@ -16,6 +17,7 @@ bool ParadoxSession::Open(const char *filename) {
 	filepath = filename;
 
 	if (0 == PX_open_file(pxdoc, filepath)) {
+		open = true;
 		blobfilepath =
 			AppendFileName(Upp::GetFileDirectory(filename), Upp::GetFileTitle(filename) + ".mb");
 		// TODO: check proper work with the blob file
@@ -67,6 +69,22 @@ dword ParadoxSession::GetInfoType(char px_ftype) {
 	default:
 		return UNKNOWN_V;
 	}
+}
+
+String ParadoxSession::GetFileTypeName() const {
+	static VectorMap<int, String> type = {
+		{0, "indexed .DB data file"},
+		{1, "primary index .PX file"},
+		{2, "non-indexed .DB data file"},
+		{3, "non-incrementing secondary index .Xnn file"},
+		{4, "secondary index .Ynn file (inc or non-inc)"},
+		{5, "incrementing secondary index .Xnn file"},
+		{6, "non-incrementing secondary index .XGn file"},
+		{7, "secondary index .YGn file (inc or non inc)"},
+		{8, "incrementing secondary index .XGn file"},
+	};
+
+	return type.Get(GetFileType(), "Unknown file type");
 }
 
 // NOLINTNEXTLINE

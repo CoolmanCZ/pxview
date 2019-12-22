@@ -34,18 +34,20 @@ PxRecordView::PxRecordView() {
 }
 
 void PxRecordView::StatusMenuBar(Bar &bar) {
-	bar.Add(t_("Show DB info"), THISBACK(ShowInfo));
+	bool enable = px.IsOpen();
+
+	bar.Add(enable, t_("Show DB info"), THISBACK(ShowInfo));
 	bar.Add(t_("Close this DB"), THISBACK(DoRemoveTab));
 	bar.Separator();
-	bar.Add(t_("Change characters encoding"), THISBACK(ChangeCharset));
+	bar.Add(enable, t_("Change characters encoding"), THISBACK(ChangeCharset));
 	bar.Separator();
-	bar.Add(t_("Delete current row"), THISBACK(DeleteRow));
+	bar.Add(enable, t_("Delete current row"), THISBACK(DeleteRow));
 	bar.Separator();
-	bar.Add(t_("Export DB as CSV"), THISBACK1(SaveAs, csv));
-	bar.Add(t_("Export DB as JSON"), THISBACK1(SaveAs, json));
+	bar.Add(enable, t_("Export DB as CSV"), THISBACK1(SaveAs, csv));
+	bar.Add(enable, t_("Export DB as JSON"), THISBACK1(SaveAs, json));
 	bar.Separator();
-	bar.Add(t_("Send current row using HTTPS (application/json)"), THISBACK(ExportJson));
-	bar.Add(t_("Send ALL rows using HTTPS (application/json)"), THISBACK(ExportAllJson));
+	bar.Add(enable, t_("Send current row using HTTPS (application/json)"), THISBACK(ExportJson));
+	bar.Add(enable, t_("Send ALL rows using HTTPS (application/json)"), THISBACK(ExportAllJson));
 }
 
 bool PxRecordView::OpenDB(const String &filePath) {
@@ -60,6 +62,9 @@ bool PxRecordView::OpenDB(const String &filePath) {
 }
 
 void PxRecordView::ReadRecords(byte charset) {
+	if (!px.IsOpen())
+		return;
+
 	Ready(false);
 	Clear(true);
 
@@ -77,6 +82,9 @@ void PxRecordView::ReadRecords(byte charset) {
 }
 
 void PxRecordView::ChangeCharset() {
+	if (!px.IsOpen())
+		return;
+
 	WithCharSetLayout<TopWindow> dlg;
 	CtrlLayout(dlg, t_("Select encoding"));
 
@@ -95,6 +103,9 @@ void PxRecordView::ChangeCharset() {
 }
 
 void PxRecordView::DeleteRow() {
+	if (!px.IsOpen())
+		return;
+
 	int row = GetRowId();
 
 	if (PromptOKCancel(t_("Delete current row from the DB?")) == IDOK) {
@@ -106,6 +117,9 @@ void PxRecordView::DeleteRow() {
 }
 
 void PxRecordView::EditData() {
+	if (!px.IsOpen())
+		return;
+
 	int row = GetRowId();
 	int col = GetColId();
 	Value data = Get(row, col);
@@ -161,6 +175,9 @@ void PxRecordView::EditData() {
 }
 
 void PxRecordView::ShowInfo() {
+	if (!px.IsOpen())
+		return;
+
 	TopWindow w;
 	ArrayCtrl info;
 
