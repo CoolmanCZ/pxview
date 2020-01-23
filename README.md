@@ -12,6 +12,8 @@ This application is based on the [pxlib](http://pxlib.sourceforge.net/) - a simp
 |---     |---    |
 |master  |[![Build status](https://ci.appveyor.com/api/projects/status/github/CoolmanCZ/pxview?svg=true)](https://ci.appveyor.com/project/CoolmanCZ/pxview)|
 
+*The Windows executable is currently not signed, which will show a warning when you run the .exe. Press 'more info' -> 'run anyway' to skip the warning.*
+
 # Installation
 
 Simply download and unzip the package from the link below and then execute PxView binary.
@@ -22,6 +24,9 @@ Download latest windows binaries and source code from [GitHub releases](https://
 
 # Changelog
 
+* 1.1.2 - core dump fix
+* 1.1.1 - submodule path changed
+* 1.1.0 - U++ framework code update, C++ performance and bug correction
 * 1.0.0 - initial version
 
 # Screenshots

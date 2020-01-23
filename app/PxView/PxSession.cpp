@@ -335,7 +335,7 @@ bool ParadoxSession::SetRowCol(int row, int col, const Value &value) {
 				date = value;
 			else
 				date = ScanDate(value.ToString());
-			int val = PX_GregorianToSdn(date.year, date.month, date.day) - 1721425;
+			long val = PX_GregorianToSdn(date.year, date.month, date.day) - 1721425;
 			PX_put_data_long(pxdoc, &data[offset], 4, val);
 			break;
 		}
@@ -345,7 +345,7 @@ bool ParadoxSession::SetRowCol(int row, int col, const Value &value) {
 				rec = value;
 			else
 				rec = ScanInt(value.ToString());
-			PX_put_data_short(pxdoc, &data[offset], 2, rec);
+			PX_put_data_short(pxdoc, &data[offset], 2, short(rec));
 			break;
 		}
 		case pxfAutoInc:
@@ -364,9 +364,9 @@ bool ParadoxSession::SetRowCol(int row, int col, const Value &value) {
 				time = value;
 			else
 				time = ScanTime(value.ToString());
-			double val = PX_GregorianToSdn(time.year, time.month, time.day) - 1721425.0;
-			val = (val * 86400.0 + time.hour * 3600 + time.minute * 60 + time.second) * 1000.0;
-			PX_put_data_double(pxdoc, &data[offset], 8, val);
+			long val = PX_GregorianToSdn(time.year, time.month, time.day) - 1721425;
+			double rec = (double(val) * 86400.0 + time.hour * 3600 + time.minute * 60 + time.second) * 1000.0;
+			PX_put_data_double(pxdoc, &data[offset], 8, rec);
 			break;
 		}
 		case pxfTime: {
@@ -375,7 +375,7 @@ bool ParadoxSession::SetRowCol(int row, int col, const Value &value) {
 				time = value;
 			else
 				time = ScanTime(value.ToString());
-			int val = time.hour * 3600000 + time.minute * 60000 + time.second * 1000.0;
+			long val = time.hour * 3600000 + time.minute * 60000 + time.second * 1000;
 			PX_put_data_long(pxdoc, &data[offset], 4, val);
 			break;
 		}
@@ -390,7 +390,7 @@ bool ParadoxSession::SetRowCol(int row, int col, const Value &value) {
 			break;
 		}
 		case pxfLogical: {
-			int val = 0;
+			char val = 0;
 			if ((value.GetType() == BOOL_V) && (value == true))
 				val = 1;
 			else {

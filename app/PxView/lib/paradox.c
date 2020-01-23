@@ -3928,7 +3928,7 @@ PX_put_data_double(pxdoc_t *pxdoc, char *data, int len, double value) {
  * A len of 0 means to store a NULL value.
  */
 PXLIB_API void PXLIB_CALL
-PX_put_data_long(pxdoc_t *pxdoc, char *data, int len, int value) {
+PX_put_data_long(pxdoc_t *pxdoc, char *data, int len, long value) {
 	if(len == 0) {
 		memset(data, 0, 4);
 	} else {

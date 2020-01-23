@@ -511,7 +511,7 @@ PXLIB_API void PXLIB_CALL
 PX_put_data_double(pxdoc_t *pxdoc, char *data, int len, double value);
 
 PXLIB_API void PXLIB_CALL
-PX_put_data_long(pxdoc_t *pxdoc, char *data, int len, int value);
+PX_put_data_long(pxdoc_t *pxdoc, char *data, int len, long value);
 
 PXLIB_API void PXLIB_CALL
 PX_put_data_short(pxdoc_t *pxdoc, char *data, int len, short int value);
