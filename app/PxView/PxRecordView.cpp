@@ -41,7 +41,7 @@ void PxRecordView::StatusMenuBar(Bar &bar) {
 	bar.Separator();
 	bar.Add(enable, t_("Change characters encoding"), THISBACK(ChangeCharset));
 	bar.Separator();
-	bar.Add(enable, t_("Delete current row"), THISBACK(DeleteRow));
+	bar.Add(enable && editing, t_("Delete current row"), THISBACK(DeleteRow));
 	bar.Separator();
 	bar.Add(enable, t_("Export DB as CSV"), THISBACK1(SaveAs, csv));
 	bar.Add(enable, t_("Export DB as JSON"), THISBACK1(SaveAs, json));
@@ -56,7 +56,7 @@ bool PxRecordView::OpenDB(const String &filePath) {
 	if (result)
 		ReadRecords();
 	else
-		Exclamation(Format("%s: %s", t_("Error during processing the file"), DeQtf(filePath)));
+		ErrorOK(Format("%s: %s", t_("Error during processing the file"), DeQtf(filePath)));
 
 	return result;
 }
@@ -103,7 +103,7 @@ void PxRecordView::ChangeCharset() {
 }
 
 void PxRecordView::DeleteRow() {
-	if (!px.IsOpen())
+	if (!px.IsOpen() || !editing)
 		return;
 
 	int row = GetRowId();
@@ -112,19 +112,20 @@ void PxRecordView::DeleteRow() {
 		if (px.DelRow(row))
 			ReadRecords();
 		else
-			Exclamation(t_("Delete row has failed!"));
+			ErrorOK(t_("Delete row has failed!"));
 	}
 }
 
 void PxRecordView::EditData() {
-	if (!px.IsOpen())
+	if (!px.IsOpen() || !editing)
 		return;
 
 	int row = GetRowId();
 	int col = GetColId();
 	Value data = Get(row, col);
 
-	Button ok, cancel;
+	Button ok;
+	Button cancel;
 
 	TopWindow editcolumn;
 	editcolumn.Title(t_("Chage column data"));
@@ -234,13 +235,13 @@ void PxRecordView::ShowInfo() {
 String PxRecordView::AsText(String (*format)(const Value &), const char *tab, const char *row,
 							const char *hdrtab, const char *hdrrow) const {
 	String txt;
-	if (hdrtab) {
+	if (hdrtab != nullptr) {
 		for (int i = 0; i < GetColumnCount(); ++i) {
-			if (i)
+			if (i > 0)
 				txt << hdrtab;
 			txt << (*format)(GetFixed(0, i));
 		}
-		if (hdrrow)
+		if (hdrrow != nullptr)
 			txt << hdrrow;
 	}
 	bool next = false;
@@ -248,7 +249,7 @@ String PxRecordView::AsText(String (*format)(const Value &), const char *tab, co
 		if (next)
 			txt << row;
 		for (int i = 0; i < GetColumnCount(); ++i) {
-			if (i)
+			if (i > 0)
 				txt << tab;
 			txt << (*format)(Get(r, i));
 		}
@@ -261,7 +262,7 @@ static String sCsvString(const String &text) {
 	String r;
 	r << '\"';
 	const char *s = text;
-	while (*s) {
+	while (*s) { // NOLINT: C code
 		if (*s == '\"')
 			r << "\\\"";
 		else
@@ -296,7 +297,7 @@ Json PxRecordView::GetJson(int row) {
 
 	for (int i = 0; i < GetColumnCount(); ++i) {
 		String val = Get(row, i).ToString();
-		if (val.GetCount()) {
+		if (val.GetCount() > 0) {
 			val.Replace("\r", "");
 			val.Replace("\n", "\\n");
 		}
@@ -321,18 +322,18 @@ void PxRecordView::SaveAsCsv(const String &dirPath) {
 	String fileName = px.GetFileName() + ".csv";
 	String filePath = AppendFileName(dirPath, fileName);
 	if (!SaveFile(filePath, AsCsv()))
-		Exclamation("Error saving the CSV file");
+		ErrorOK("Error saving the CSV file");
 	else
-		Exclamation("Successfully saved the CSV file");
+		PromptOK("Successfully saved the CSV file");
 }
 
 void PxRecordView::SaveAsJson(const String &dirPath) {
 	String fileName = px.GetFileName() + ".json";
 	String filePath = AppendFileName(dirPath, fileName);
 	if (!SaveFile(filePath, AsJson()))
-		Exclamation("Error saving the JSON file");
+		ErrorOK("Error saving the JSON file");
 	else
-		Exclamation("Successfully saved the JSON file");
+		PromptOK("Successfully saved the JSON file");
 }
 
 void PxRecordView::GetUrl(bool &upload, String &url, String &auth, bool &checkError) {
@@ -397,8 +398,10 @@ int PxRecordView::SendData(const Json &data, const String &url, const String &au
 }
 
 void PxRecordView::ExportJson() {
-	bool upload, checkError;
-	String url, authorization;
+	bool upload;
+	bool checkError;
+	String url;
+	String authorization;
 	GetUrl(upload, url, authorization, checkError);
 
 	if (FileExists(httpErrorLogPath))
@@ -411,8 +414,10 @@ void PxRecordView::ExportJson() {
 }
 
 void PxRecordView::ExportAllJson() {
-	bool upload, checkError;
-	String url, authorization;
+	bool upload;
+	bool checkError;
+	String url;
+	String authorization;
 	GetUrl(upload, url, authorization, checkError);
 
 	if (FileExists(httpErrorLogPath))

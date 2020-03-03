@@ -37,7 +37,7 @@ PxView::PxView() {
 }
 
 void PxView::Exit() {
-	if (PromptOKCancel(t_("Exit Paradox database viewer?")))
+	if (PromptOKCancel(t_("Exit Paradox database viewer?")) == 1)
 		Close();
 }
 
@@ -52,7 +52,7 @@ void PxView::MenuMain(Bar &menu) {
 }
 
 void PxView::MenuFile(Bar &menu) {
-	bool enable = tab.GetCount();
+	bool enable = tab.GetCount() > 0;
 
 	menu.Add(t_("Open DB file"), CtrlImg::open(), THISBACK(OpenFile))
 		.Key(K_CTRL_O)
@@ -69,11 +69,11 @@ void PxView::MenuFile(Bar &menu) {
 void PxView::MenuDB(Bar &menu) {
 	bool enable = false;
 
-	if (tab.GetCount()) {
+	if (tab.GetCount() > 0) {
 		int curTab = tab.Get();
 		TabCtrl::Item &myTab = tab.GetItem(curTab);
 		auto *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
-		if (px && px->IsDBOpen())
+		if (px != nullptr && px->IsDBOpen())
 			enable = true;
 	}
 
@@ -127,14 +127,14 @@ void PxView::LoadFile(const String &filePath) {
 	for (int i = 0; i < tab.GetCount(); ++i) {
 		TabCtrl::Item &myTab = tab.GetItem(i);
 		auto *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
-		if (px && px->GetFilePath().IsEqual(filePath)) {
+		if (px != nullptr && px->GetFilePath().IsEqual(filePath)) {
 			tab.Set(i);
 			return;
 		}
 	}
 
 	PxRecordView *px = GetPxRecordView(filePath);
-	if (px) {
+	if (px != nullptr) {
 		tab.Add(px->SizePos(), px->GetFileName());
 		tab.Set(tab.GetCount() - 1);
 		px->WhenRemoveTab = THISBACK(RemoveTab);
@@ -146,7 +146,7 @@ void PxView::ShowInfo() {
 	int curTab = tab.Get();
 	TabCtrl::Item &myTab = tab.GetItem(curTab);
 	auto *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
-	if (px)
+	if (px != nullptr)
 		px->ShowInfo();
 }
 
@@ -154,7 +154,7 @@ void PxView::ChangeCharset() {
 	int curTab = tab.Get();
 	TabCtrl::Item &myTab = tab.GetItem(curTab);
 	auto *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
-	if (px)
+	if (px != nullptr)
 		px->ChangeCharset();
 }
 
@@ -162,7 +162,7 @@ void PxView::DeleteRow() {
 	int curTab = tab.Get();
 	TabCtrl::Item &myTab = tab.GetItem(curTab);
 	auto *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
-	if (px)
+	if (px != nullptr)
 		px->DeleteRow();
 }
 
@@ -174,7 +174,7 @@ void PxView::SaveAs(const int fileType) {
 	int curTab = tab.Get();
 	TabCtrl::Item &myTab = tab.GetItem(curTab);
 	auto *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
-	if (px) {
+	if (px != nullptr) {
 		if (fileType == csv)
 			px->SaveAsCsv(fileSel.Get());
 		else
@@ -190,7 +190,7 @@ void PxView::SaveAllAs(const int fileType) {
 	for (int i = 0; i < tab.GetCount(); ++i) {
 		TabCtrl::Item &myTab = tab.GetItem(i);
 		auto *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
-		if (px) {
+		if (px != nullptr) {
 			if (fileType == csv)
 				px->SaveAsCsv(fileSel.Get());
 			else
@@ -203,7 +203,7 @@ void PxView::ExportJson() {
 	int curTab = tab.Get();
 	TabCtrl::Item &myTab = tab.GetItem(curTab);
 	auto *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
-	if (px)
+	if (px != nullptr)
 		px->ExportJson();
 }
 
@@ -211,7 +211,7 @@ void PxView::ExportAllJson() {
 	int curTab = tab.Get();
 	TabCtrl::Item &myTab = tab.GetItem(curTab);
 	auto *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
-	if (px)
+	if (px != nullptr)
 		px->ExportAllJson();
 }
 
@@ -237,7 +237,7 @@ void PxView::RemoveTab() {
 	int curTab = tab.Get();
 	TabCtrl::Item &myTab = tab.GetItem(curTab);
 	auto *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
-	if (px)
+	if (px != nullptr)
 		RemovePxRecordView(px->GetFilePath());
 
 	tab.Remove(curTab);
@@ -249,7 +249,7 @@ void PxView::CountRows() {
 	if (curTab > -1) {
 		TabCtrl::Item &myTab = tab.GetItem(curTab);
 		auto *px = dynamic_cast<PxRecordView *>(myTab.GetSlave());
-		if (px)
+		if (px != nullptr)
 			rows = px->GetCountRows();
 	}
 	numrows.SetText(AsString(rows));

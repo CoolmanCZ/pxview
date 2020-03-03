@@ -22,7 +22,7 @@ bool ParadoxSession::Open(const char *filename) {
 			AppendFileName(Upp::GetFileDirectory(filename), Upp::GetFileTitle(filename) + ".mb");
 		// TODO: check proper work with the blob file
 		// if (FileExists(blobfilepath) && (0 > PX_set_blob_file(pxdoc, blobfilepath))) {
-		//	Exclamation(Format("%s: %s", t_("Could not open blob file"), DeQtf(blobfilepath)));
+		//	ErrorOK(Format("%s: %s", t_("Could not open blob file"), DeQtf(blobfilepath)));
 		//	return false;
 		//}
 		return true;
@@ -132,7 +132,7 @@ Vector<Value> ParadoxSession::GetRow(int row, byte charset) {
 	int offset = 0;
 	pxfield_t *pxf = PX_get_fields(pxdoc);
 	byte codepage = CharsetByName(GetCharsetName());
-	if (charset)
+	if (charset > 0)
 		codepage = charset;
 
 	for (int i = 0; i < PX_get_num_fields(pxdoc); ++i) {
@@ -212,7 +212,7 @@ Vector<Value> ParadoxSession::GetRow(int row, byte charset) {
 			char value;
 			val = false;
 			if (0 < PX_get_data_byte(pxdoc, &data[offset], pxf->px_flen, &value)) {
-				if (value)
+				if (value > 0)
 					val = true;
 			}
 			record.Add(val);
@@ -224,7 +224,9 @@ Vector<Value> ParadoxSession::GetRow(int row, byte charset) {
 		case pxfMemoBLOb:
 		case pxfOLE: {
 			char *blobdata;
-			int mod_nr, size, ret;
+			int mod_nr;
+			int size;
+			int ret;
 
 			if (pxf->px_ftype == pxfGraphic)
 				ret = PX_get_data_graphic(pxdoc, &data[offset], pxf->px_flen, &mod_nr, &size,
@@ -233,7 +235,7 @@ Vector<Value> ParadoxSession::GetRow(int row, byte charset) {
 				ret =
 					PX_get_data_blob(pxdoc, &data[offset], pxf->px_flen, &mod_nr, &size, &blobdata);
 
-			if ((ret > 0) && (blobdata)) {
+			if ((ret > 0) && (blobdata != nullptr)) {
 				if (pxf->px_ftype == pxfFmtMemoBLOb || pxf->px_ftype == pxfMemoBLOb) {
 					String out(blobdata, size);
 					val = Upp::ToUnicode(out, codepage);
@@ -365,7 +367,9 @@ bool ParadoxSession::SetRowCol(int row, int col, const Value &value) {
 			else
 				time = ScanTime(value.ToString());
 			long val = PX_GregorianToSdn(time.year, time.month, time.day) - 1721425;
-			double rec = (double(val) * 86400.0 + time.hour * 3600 + time.minute * 60 + time.second) * 1000.0;
+			double rec =
+				(double(val) * 86400.0 + time.hour * 3600 + time.minute * 60 + time.second) *
+				1000.0;
 			PX_put_data_double(pxdoc, &data[offset], 8, rec);
 			break;
 		}
@@ -396,7 +400,7 @@ bool ParadoxSession::SetRowCol(int row, int col, const Value &value) {
 			else {
 				String str = Upp::FromUnicode((WString)value, codepage);
 				str = ToLower(TrimBoth(str));
-				if (str.Compare("1") == 0 || str.Compare("true") || str.Compare("t"))
+				if (str.IsEqual("1") || str.IsEqual("true") || str.IsEqual("t"))
 					val = 1;
 			}
 			PX_put_data_byte(pxdoc, &data[offset], 1, val);

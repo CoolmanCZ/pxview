@@ -24,6 +24,7 @@ Download latest windows binaries and source code from [GitHub releases](https://
 
 # Changelog
 
+* 1.1.3 - submodules update, small code corrections
 * 1.1.2 - core dump fix
 * 1.1.1 - submodule path changed
 * 1.1.0 - U++ framework code update, C++ performance and bug correction

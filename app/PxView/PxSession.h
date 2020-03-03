@@ -42,14 +42,14 @@ class ParadoxSession {
 	virtual bool IsBlob() const { return NULL != pxdoc->px_blob; }
 
   private:
-	pxdoc_t *pxdoc;
+	bool open = false;
+	pxdoc_t *pxdoc = nullptr;
 
-	bool open;
 	String filepath;
 	String blobfilepath;
 
 	static void ErrorHandler(pxdoc_t *p, int error, const char *str, void *data) {
-		Exclamation(Format("PXLib: %s", str));
+		PromptOK(Format("PXLib: %s", str));
 	}
 	dword GetInfoType(char px_ftype);
 
