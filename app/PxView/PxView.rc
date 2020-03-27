@@ -17,7 +17,7 @@ BEGIN
       VALUE "FileDescription", "PxView"
       VALUE "FileVersion", FILEVERSION_STR
       VALUE "InternalName", "PxView"
-      VALUE "LegalCopyright", "Copyright (c) 2019 Radek Malcic"
+      VALUE "LegalCopyright", "Copyright (c) 2019-2020 Radek Malcic"
       VALUE "OriginalFilename", "PxView.exe"
       VALUE "ProductName", "PxView"
       VALUE "ProductVersion", PRODUCTVERSION_STR
@@ -28,7 +28,7 @@ BEGIN
       VALUE "FileDescription", "PxView"
       VALUE "FileVersion", FILEVERSION_STR
       VALUE "InternalName", "PxView"
-      VALUE "LegalCopyright", "Copyright (c) 2019 Radek Malčic"
+      VALUE "LegalCopyright", "Copyright (c) 2019-2020 Radek Malčic"
       VALUE "OriginalFilename", "PxBiew.exe"
       VALUE "ProductName", "PxView"
       VALUE "ProductVersion", PRODUCTVERSION_STR
