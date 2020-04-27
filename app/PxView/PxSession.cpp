@@ -150,13 +150,15 @@ Vector<Value> ParadoxSession::GetRow(int row, byte charset) {
 		case pxfDate: {
 			long value;
 			if (0 < PX_get_data_long(pxdoc, &data[offset], pxf->px_flen, &value)) {
-				char const *date_format = "d/m/Y";
-				char *str =
-					PX_timestamp2string(pxdoc, (double)value * 1000.0 * 86400.0, date_format);
 				Date d;
-				StrToDate("dmy", d, str);
+				if (value > 0) {
+					char const *date_format = "d/m/Y";
+					char *str =
+						PX_timestamp2string(pxdoc, (double)value * 1000.0 * 86400.0, date_format);
+					StrToDate("dmy", d, str, Date(1900, 1, 1));
+					pxdoc->free(pxdoc, str);
+				}
 				val = d;
-				pxdoc->free(pxdoc, str);
 			}
 			record.Add(val);
 			break;
