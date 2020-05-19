@@ -36,10 +36,10 @@ UPP_SRC_DIR="${UPP_SRC_BASE}/uppsrc"
 PROJECT_NAME="app/PxView/PxView.upp"
 
 if [ $# -lt 1 ]; then
-  echo "# linux build"
+  echo "# Linux build"
   PROJECT_FLAGS="-DflagGUI -DflagMT -DflagGCC -DflagLINUX -DflagPOSIX -DflagSHARED"
 else
-  echo "# MinGW build"
+  echo "# Windows build"
   PROJECT_FLAGS="-DflagGUI -DflagMT -DflagGCC -DflagPOSIX"
 fi
 

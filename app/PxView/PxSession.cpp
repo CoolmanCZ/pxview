@@ -73,15 +73,15 @@ dword ParadoxSession::GetInfoType(char px_ftype) {
 
 String ParadoxSession::GetFileTypeName() const {
 	static VectorMap<int, String> type = {
-		{0, "indexed .DB data file"},
-		{1, "primary index .PX file"},
-		{2, "non-indexed .DB data file"},
-		{3, "non-incrementing secondary index .Xnn file"},
-		{4, "secondary index .Ynn file (inc or non-inc)"},
-		{5, "incrementing secondary index .Xnn file"},
-		{6, "non-incrementing secondary index .XGn file"},
-		{7, "secondary index .YGn file (inc or non inc)"},
-		{8, "incrementing secondary index .XGn file"},
+		{0, "indexed .DB data file"},					   // NOLINT: map index
+		{1, "primary index .PX file"},					   // NOLINT: map index
+		{2, "non-indexed .DB data file"},				   // NOLINT: map index
+		{3, "non-incrementing secondary index .Xnn file"}, // NOLINT: map index
+		{4, "secondary index .Ynn file (inc or non-inc)"}, // NOLINT: map index
+		{5, "incrementing secondary index .Xnn file"},	 // NOLINT: map index
+		{6, "non-incrementing secondary index .XGn file"}, // NOLINT: map index
+		{7, "secondary index .YGn file (inc or non inc)"}, // NOLINT: map index
+		{8, "incrementing secondary index .XGn file"},	 // NOLINT: map index
 	};
 
 	return type.Get(GetFileType(), "Unknown file type");
@@ -118,22 +118,25 @@ Vector<String> ParadoxSession::EnumTables(String database) {
 Vector<Value> ParadoxSession::GetRow(int row, byte charset) {
 	Vector<Value> record;
 
-	if (row < 0 || row > GetNumRecords())
+	if (row < 0 || row > GetNumRecords()) {
 		return record;
+	}
 
 	pxdatablockinfo_t pxdbinfo;
 	int isdeleted = 0; // TODO: allow option to select deleted data
 	int recordsize = PX_get_recordsize(pxdoc);
 
 	StringBuffer data(recordsize);
-	if (nullptr == PX_get_record2(pxdoc, row, data, &isdeleted, &pxdbinfo))
+	if (nullptr == PX_get_record2(pxdoc, row, data, &isdeleted, &pxdbinfo)) {
 		return record;
+	}
 
 	int offset = 0;
 	pxfield_t *pxf = PX_get_fields(pxdoc);
 	byte codepage = CharsetByName(GetCharsetName());
-	if (charset > 0)
+	if (charset > 0) {
 		codepage = charset;
+	}
 
 	for (int i = 0; i < PX_get_num_fields(pxdoc); ++i) {
 		Value val;
@@ -152,10 +155,10 @@ Vector<Value> ParadoxSession::GetRow(int row, byte charset) {
 			if (0 < PX_get_data_long(pxdoc, &data[offset], pxf->px_flen, &value)) {
 				Date d;
 				if (value > 0) {
-					char const *date_format = "d/m/Y";
-					char *str =
-						PX_timestamp2string(pxdoc, (double)value * 1000.0 * 86400.0, date_format);
-					StrToDate("dmy", d, str, Date(1900, 1, 1));
+					char const *fmt = "d/m/Y";
+					// NOLINTNEXTLINE: date calculation
+					char *str = PX_timestamp2string(pxdoc, (double)value * 1000.0 * 86400.0, fmt);
+					StrToDate("dmy", d, str, Date(1900, 1, 1)); // NOLINT: default date
 					pxdoc->free(pxdoc, str);
 				}
 				val = d;
@@ -165,24 +168,26 @@ Vector<Value> ParadoxSession::GetRow(int row, byte charset) {
 		}
 		case pxfShort: {
 			short int value;
-			if (0 < PX_get_data_short(pxdoc, &data[offset], pxf->px_flen, &value))
+			if (0 < PX_get_data_short(pxdoc, &data[offset], pxf->px_flen, &value)) {
 				val = value;
+			}
 			record.Add(val);
 			break;
 		}
 		case pxfAutoInc:
 		case pxfLong: {
 			long value;
-			if (0 < PX_get_data_long(pxdoc, &data[offset], pxf->px_flen, &value))
+			if (0 < PX_get_data_long(pxdoc, &data[offset], pxf->px_flen, &value)) {
 				val = (int)value;
+			}
 			record.Add(val);
 			break;
 		}
 		case pxfTimestamp: {
 			double value;
 			if (0 < PX_get_data_double(pxdoc, &data[offset], pxf->px_flen, &value)) {
-				char const *timestamp_format = "d/m/Y H:i:s";
-				char *str = PX_timestamp2string(pxdoc, value, timestamp_format);
+				char const *fmt = "d/m/Y H:i:s";
+				char *str = PX_timestamp2string(pxdoc, value, fmt);
 				Time t;
 				StrToTime("dmy", t, str);
 				val = t;
@@ -194,8 +199,8 @@ Vector<Value> ParadoxSession::GetRow(int row, byte charset) {
 		case pxfTime: {
 			long value;
 			if (0 < PX_get_data_long(pxdoc, &data[offset], pxf->px_flen, &value)) {
-				char const *time_format = "H:i:s";
-				char *str = PX_timestamp2string(pxdoc, (double)value, time_format);
+				char const *fmt = "H:i:s";
+				char *str = PX_timestamp2string(pxdoc, (double)value, fmt);
 				val = str;
 				pxdoc->free(pxdoc, str);
 			}
@@ -205,8 +210,9 @@ Vector<Value> ParadoxSession::GetRow(int row, byte charset) {
 		case pxfCurrency:
 		case pxfNumber: {
 			double value;
-			if (0 < PX_get_data_double(pxdoc, &data[offset], pxf->px_flen, &value))
+			if (0 < PX_get_data_double(pxdoc, &data[offset], pxf->px_flen, &value)) {
 				val = value;
+			}
 			record.Add(val);
 			break;
 		}
@@ -214,8 +220,9 @@ Vector<Value> ParadoxSession::GetRow(int row, byte charset) {
 			char value;
 			val = false;
 			if (0 < PX_get_data_byte(pxdoc, &data[offset], pxf->px_flen, &value)) {
-				if (value > 0)
+				if (value > 0) {
 					val = true;
+				}
 			}
 			record.Add(val);
 			break;
@@ -230,12 +237,13 @@ Vector<Value> ParadoxSession::GetRow(int row, byte charset) {
 			int size;
 			int ret;
 
-			if (pxf->px_ftype == pxfGraphic)
+			if (pxf->px_ftype == pxfGraphic) {
 				ret = PX_get_data_graphic(pxdoc, &data[offset], pxf->px_flen, &mod_nr, &size,
 										  &blobdata);
-			else
+			} else {
 				ret =
 					PX_get_data_blob(pxdoc, &data[offset], pxf->px_flen, &mod_nr, &size, &blobdata);
+			}
 
 			if ((ret > 0) && (blobdata != nullptr)) {
 				if (pxf->px_ftype == pxfFmtMemoBLOb || pxf->px_ftype == pxfMemoBLOb) {
@@ -281,28 +289,32 @@ Vector<Value> ParadoxSession::GetRow(int row, byte charset) {
 }
 
 bool ParadoxSession::DelRow(int row) {
-	if (row < 0 || row > GetNumRecords())
+	if (row < 0 || row > GetNumRecords()) {
 		return false;
+	}
 
 	pxdatablockinfo_t pxdbinfo;
 	int isdeleted = 0;
 	int recordsize = PX_get_recordsize(pxdoc);
 
 	StringBuffer data(recordsize);
-	if (nullptr == PX_get_record2(pxdoc, row, data, &isdeleted, &pxdbinfo))
+	if (nullptr == PX_get_record2(pxdoc, row, data, &isdeleted, &pxdbinfo)) {
 		return false;
+	}
 
 	bool result = false;
 	int ret = PX_delete_record(pxdoc, row);
-	if (ret > -1)
+	if (ret > -1) {
 		result = true;
+	}
 
 	return result;
 }
 
 bool ParadoxSession::SetRowCol(int row, int col, const Value &value) {
-	if (col >= PX_get_num_fields(pxdoc) || row < 0 || row > GetNumRecords())
+	if (col >= PX_get_num_fields(pxdoc) || row < 0 || row > GetNumRecords()) {
 		return false;
+	}
 
 	pxdatablockinfo_t pxdbinfo;
 	int isdeleted = 0;
@@ -310,8 +322,9 @@ bool ParadoxSession::SetRowCol(int row, int col, const Value &value) {
 
 	StringBuffer data(recordsize);
 
-	if (nullptr == PX_get_record2(pxdoc, row, data, &isdeleted, &pxdbinfo))
+	if (nullptr == PX_get_record2(pxdoc, row, data, &isdeleted, &pxdbinfo)) {
 		return false;
+	}
 
 	bool result = false;
 	int offset = 0;
@@ -324,8 +337,9 @@ bool ParadoxSession::SetRowCol(int row, int col, const Value &value) {
 			++pxf; // NOLINT: C code
 			continue;
 		}
-		if (i > col)
+		if (i > col) {
 			break;
+		}
 
 		switch (pxf->px_ftype) {
 		case pxfAlpha: {
@@ -335,77 +349,84 @@ bool ParadoxSession::SetRowCol(int row, int col, const Value &value) {
 		}
 		case pxfDate: {
 			Date date;
-			if (value.GetType() == DATE_V)
+			if (value.GetType() == DATE_V) {
 				date = value;
-			else
+			} else {
 				date = ScanDate(value.ToString());
-			long val = PX_GregorianToSdn(date.year, date.month, date.day) - 1721425;
-			PX_put_data_long(pxdoc, &data[offset], 4, val);
+			}
+			long val = PX_GregorianToSdn(date.year, date.month, date.day) - CalendarsDiff;
+			PX_put_data_long(pxdoc, &data[offset], len4, val);
 			break;
 		}
 		case pxfShort: {
 			int rec;
-			if (value.GetType() == INT_V)
+			if (value.GetType() == INT_V) {
 				rec = value;
-			else
+			} else {
 				rec = ScanInt(value.ToString());
-			PX_put_data_short(pxdoc, &data[offset], 2, short(rec));
+			}
+			PX_put_data_short(pxdoc, &data[offset], len2, short(rec));
 			break;
 		}
 		case pxfAutoInc:
 		case pxfLong: {
 			int rec;
-			if (value.GetType() == INT_V)
+			if (value.GetType() == INT_V) {
 				rec = value;
-			else
+			} else {
 				rec = ScanInt(value.ToString());
-			PX_put_data_long(pxdoc, &data[offset], 4, rec);
+			}
+			PX_put_data_long(pxdoc, &data[offset], len4, rec);
 			break;
 		}
 		case pxfTimestamp: {
-			Time time;
-			if (value.GetType() == TIME_V)
-				time = value;
-			else
-				time = ScanTime(value.ToString());
-			long val = PX_GregorianToSdn(time.year, time.month, time.day) - 1721425;
-			double rec =
-				(double(val) * 86400.0 + time.hour * 3600 + time.minute * 60 + time.second) *
-				1000.0;
-			PX_put_data_double(pxdoc, &data[offset], 8, rec);
+			Time t;
+			if (value.GetType() == TIME_V) {
+				t = value;
+			} else {
+				t = ScanTime(value.ToString());
+			}
+			long val = PX_GregorianToSdn(t.year, t.month, t.day) - CalendarsDiff;
+			// NOLINTNEXTLINE: t calculation
+			double rec = (double(val) * 86400 + t.hour * 3600 + t.minute * 60 + t.second) * 1000.0;
+			PX_put_data_double(pxdoc, &data[offset], len8, rec);
 			break;
 		}
 		case pxfTime: {
-			Time time;
-			if (value.GetType() == TIME_V)
-				time = value;
-			else
-				time = ScanTime(value.ToString());
-			long val = time.hour * 3600000 + time.minute * 60000 + time.second * 1000;
-			PX_put_data_long(pxdoc, &data[offset], 4, val);
+			Time t;
+			if (value.GetType() == TIME_V) {
+				t = value;
+			} else {
+				t = ScanTime(value.ToString());
+			}
+			// NOLINTNEXTLINE: t calculation
+			long val = t.hour * 3600000 + t.minute * 60000 + t.second * 1000;
+			PX_put_data_long(pxdoc, &data[offset], len4, val);
 			break;
 		}
 		case pxfCurrency:
 		case pxfNumber: {
 			double rec;
-			if (value.GetType() == DOUBLE_V)
+			if (value.GetType() == DOUBLE_V) {
 				rec = value;
-			else
+			} else {
 				rec = ScanDouble(value.ToString());
-			PX_put_data_double(pxdoc, &data[offset], 8, rec);
+			}
+			PX_put_data_double(pxdoc, &data[offset], len8, rec);
 			break;
 		}
 		case pxfLogical: {
 			char val = 0;
-			if ((value.GetType() == BOOL_V) && (value == true))
+			if ((value.GetType() == BOOL_V) && (value == true)) {
 				val = 1;
-			else {
+			} else {
 				String str = Upp::FromUnicode((WString)value, codepage);
 				str = ToLower(TrimBoth(str));
-				if (str.IsEqual("1") || str.IsEqual("true") || str.IsEqual("t"))
+				if (str.IsEqual("1") || str.IsEqual("true") || str.IsEqual("t")) {
 					val = 1;
+				}
 			}
-			PX_put_data_byte(pxdoc, &data[offset], 1, val);
+			PX_put_data_byte(pxdoc, &data[offset], len1, val);
 			break;
 		}
 		case pxfFmtMemoBLOb:
@@ -432,8 +453,9 @@ bool ParadoxSession::SetRowCol(int row, int col, const Value &value) {
 		++pxf; // NOLINT: C code
 	}
 
-	if (PX_put_recordn(pxdoc, data, row) > -1)
+	if (PX_put_recordn(pxdoc, data, row) > -1) {
 		result = true;
+	}
 
 	return result;
 }

@@ -45,6 +45,12 @@ class ParadoxSession {
 	bool open = false;
 	pxdoc_t *pxdoc = nullptr;
 
+	const int len1 = 1;
+	const int len2 = 2;
+	const int len4 = 4;
+	const int len8 = 8;
+	const int CalendarsDiff = 1721425;
+
 	String filepath;
 	String blobfilepath;
 

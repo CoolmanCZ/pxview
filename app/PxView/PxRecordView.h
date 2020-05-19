@@ -18,6 +18,12 @@ class PxRecordView : public Upp::GridCtrl {
 	Upp::ParadoxSession px;
 	bool modified;
 
+	const int EditSizeHorz = 640;
+	const int EditSizeVert = 72;
+	const int InfoSizeHorz = 500;
+	const int InfoSizeVert = 400;
+	const int IndicatorSize = 12;
+
 	Upp::Progress httpPI;
 	Upp::HttpRequest httpClient;
 	Upp::int64 httpLoaded;

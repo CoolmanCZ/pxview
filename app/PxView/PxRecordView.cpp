@@ -30,7 +30,7 @@ PxRecordView::PxRecordView() {
 		.SetToolBar()
 		.SelectRow()
 		.MultiSelect()
-		.Indicator(true, 12);
+		.Indicator(true, IndicatorSize);
 }
 
 void PxRecordView::StatusMenuBar(Bar &bar) {
@@ -53,24 +53,27 @@ void PxRecordView::StatusMenuBar(Bar &bar) {
 bool PxRecordView::OpenDB(const String &filePath) {
 	bool result = px.Open(filePath);
 
-	if (result)
+	if (result) {
 		ReadRecords();
-	else
+	} else {
 		ErrorOK(Format("%s: %s", t_("Error during processing the file"), DeQtf(filePath)));
+	}
 
 	return result;
 }
 
 void PxRecordView::ReadRecords(byte charset) {
-	if (!px.IsOpen())
+	if (!px.IsOpen()) {
 		return;
+	}
 
 	Ready(false);
 	Clear(true);
 
 	Vector<SqlColumnInfo> columns = px.EnumColumns(nullptr, nullptr);
-	for (int i = 0; i < columns.GetCount(); ++i)
+	for (int i = 0; i < columns.GetCount(); ++i) {
 		AddColumn(static_cast<Id>(columns[i].name), columns[i].name);
+	}
 
 	Vector<Value> row;
 	for (int i = 0; i < px.GetNumRecords(); ++i) {
@@ -82,15 +85,17 @@ void PxRecordView::ReadRecords(byte charset) {
 }
 
 void PxRecordView::ChangeCharset() {
-	if (!px.IsOpen())
+	if (!px.IsOpen()) {
 		return;
+	}
 
 	WithCharSetLayout<TopWindow> dlg;
 	CtrlLayout(dlg, t_("Select encoding"));
 
 	dlg.d.Add(CHARSET_UTF8, "UTF8");
-	for (int i = 1; i < CharsetCount(); i++)
+	for (int i = 1; i < CharsetCount(); i++) {
 		dlg.d.Add(i, CharsetName(i));
+	}
 	dlg.d.GoBegin();
 
 	dlg.cancel <<= dlg.Breaker(IDCANCEL);
@@ -103,22 +108,25 @@ void PxRecordView::ChangeCharset() {
 }
 
 void PxRecordView::DeleteRow() {
-	if (!px.IsOpen() || !editing)
+	if (!px.IsOpen() || !editing) {
 		return;
+	}
 
 	int row = GetRowId();
 
 	if (PromptOKCancel(t_("Delete current row from the DB?")) == IDOK) {
-		if (px.DelRow(row))
+		if (px.DelRow(row)) {
 			ReadRecords();
-		else
+		} else {
 			ErrorOK(t_("Delete row has failed!"));
+		}
 	}
 }
 
 void PxRecordView::EditData() {
-	if (!px.IsOpen() || !editing)
+	if (!px.IsOpen() || !editing) {
 		return;
+	}
 
 	int row = GetRowId();
 	int col = GetColId();
@@ -129,10 +137,12 @@ void PxRecordView::EditData() {
 
 	TopWindow editcolumn;
 	editcolumn.Title(t_("Chage column data"));
-	editcolumn.SetRect(0, 0, 640, 72);
+	editcolumn.SetRect(0, 0, EditSizeHorz, EditSizeVert);
 	editcolumn.Sizeable().Zoomable();
 
+	// NOLINTNEXTLINE: position
 	editcolumn.Add(ok.SetLabel(t_("OK")).RightPosZ(4, 56).BottomPosZ(4, 20));
+	// NOLINTNEXTLINE: position
 	editcolumn.Add(cancel.SetLabel(t_("Cancel")).RightPosZ(64, 56).BottomPosZ(4, 20));
 
 	editcolumn.Acceptor(ok, IDOK);
@@ -148,22 +158,23 @@ void PxRecordView::EditData() {
 	DropTime etime;
 
 	dword type = data.GetType();
-	if (type == INT_V)
+	if (type == INT_V) {
 		c = &ei;
-	else if (type == BOOL_V)
+	} else if (type == BOOL_V) {
 		c = &es;
-	else if (type == DOUBLE_V)
+	} else if (type == DOUBLE_V) {
 		c = &ed;
-	else if (type == DATE_V)
+	} else if (type == DATE_V) {
 		c = &edate;
-	else if (type == TIME_V)
+	} else if (type == TIME_V) {
 		c = &etime;
-	else
+	} else {
 		c = &es;
+	}
 
 	editcolumn.Add(*c);
-	c->HSizePosZ(4, 4);
-	c->VSizePosZ(4, 28);
+	c->HSizePosZ(4, 4);  // NOLINT: position
+	c->VSizePosZ(4, 28); // NOLINT: position
 	c->SetData(data);
 
 	if (editcolumn.Execute() == IDOK) {
@@ -176,8 +187,9 @@ void PxRecordView::EditData() {
 }
 
 void PxRecordView::ShowInfo() {
-	if (!px.IsOpen())
+	if (!px.IsOpen()) {
 		return;
+	}
 
 	TopWindow w;
 	ArrayCtrl info;
@@ -208,8 +220,9 @@ void PxRecordView::ShowInfo() {
 		info.Add("Sort order of field", px.GetRefIntegrity());
 	}
 
-	if ((px.GetFileType() == pxfFileTypIndexDB) || (px.GetFileType() == pxfFileTypNonIndexDB))
+	if ((px.GetFileType() == pxfFileTypIndexDB) || (px.GetFileType() == pxfFileTypNonIndexDB)) {
 		info.Add("Number of primary key fields", px.GetPrimaryKeyField());
+	}
 
 	if (px.GetFileType() == pxfFileTypPrimIndex) {
 		info.Add("Root index block number", px.GetAutoInc());
@@ -225,7 +238,7 @@ void PxRecordView::ShowInfo() {
 	info.Add("Modified Flags 1", px.GetModFlags1());
 	info.Add("Modified Flags 2", px.GetModFlags2());
 
-	w.SetRect(0, 0, 500, 400);
+	w.SetRect(0, 0, InfoSizeHorz, InfoSizeVert);
 	w.Sizeable();
 	w.Add(info.SizePos());
 
@@ -237,20 +250,24 @@ String PxRecordView::AsText(String (*format)(const Value &), const char *tab, co
 	String txt;
 	if (hdrtab != nullptr) {
 		for (int i = 0; i < GetColumnCount(); ++i) {
-			if (i > 0)
+			if (i > 0) {
 				txt << hdrtab;
+			}
 			txt << (*format)(GetFixed(0, i));
 		}
-		if (hdrrow != nullptr)
+		if (hdrrow != nullptr) {
 			txt << hdrrow;
+		}
 	}
 	bool next = false;
 	for (int r = 0; r < GetCount(); ++r) {
-		if (next)
+		if (next) {
 			txt << row;
+		}
 		for (int i = 0; i < GetColumnCount(); ++i) {
-			if (i > 0)
+			if (i > 0) {
 				txt << tab;
+			}
 			txt << (*format)(Get(r, i));
 		}
 		next = true;
@@ -263,10 +280,11 @@ static String sCsvString(const String &text) {
 	r << '\"';
 	const char *s = text;
 	while (*s) { // NOLINT: C code
-		if (*s == '\"')
+		if (*s == '\"') {
 			r << "\\\"";
-		else
+		} else {
 			r.Cat(*s);
+		}
 		s++; // NOLINT: C code
 	}
 	r << '\"';
@@ -286,8 +304,9 @@ String PxRecordView::AsCsv(int sep, bool hdr) {
 String PxRecordView::AsJson() {
 	JsonArray data;
 
-	for (int r = 0; r < GetCount(); ++r)
+	for (int r = 0; r < GetCount(); ++r) {
 		data << GetJson(r);
+	}
 
 	return data.ToString();
 }
@@ -309,31 +328,35 @@ Json PxRecordView::GetJson(int row) {
 
 void PxRecordView::SaveAs(const int filetype) {
 	FileSel file;
-	if (!file.ExecuteSelectDir(t_("Select directory to save the file")))
+	if (!file.ExecuteSelectDir(t_("Select directory to save the file"))) {
 		return;
+	}
 
-	if (filetype == csv)
+	if (filetype == csv) {
 		SaveAsCsv(file.Get());
-	else
+	} else {
 		SaveAsJson(file.Get());
+	}
 }
 
 void PxRecordView::SaveAsCsv(const String &dirPath) {
 	String fileName = px.GetFileName() + ".csv";
 	String filePath = AppendFileName(dirPath, fileName);
-	if (!SaveFile(filePath, AsCsv()))
+	if (!SaveFile(filePath, AsCsv())) {
 		ErrorOK("Error saving the CSV file");
-	else
+	} else {
 		PromptOK("Successfully saved the CSV file");
+	}
 }
 
 void PxRecordView::SaveAsJson(const String &dirPath) {
 	String fileName = px.GetFileName() + ".json";
 	String filePath = AppendFileName(dirPath, fileName);
-	if (!SaveFile(filePath, AsJson()))
+	if (!SaveFile(filePath, AsJson())) {
 		ErrorOK("Error saving the JSON file");
-	else
+	} else {
 		PromptOK("Successfully saved the JSON file");
+	}
 }
 
 void PxRecordView::GetUrl(bool &upload, String &url, String &auth, bool &checkError) {

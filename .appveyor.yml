@@ -17,7 +17,7 @@ skip_non_tags: true
 #    environment configuration    #
 #---------------------------------#
 # Build worker image (VM template)
-#image: Visual Studio 2017
+#image: Visual Studio 2019
 
 # environment variables
 environment:
@@ -57,7 +57,7 @@ build_script:
   - cmd: set /p APP_VERSION= < APP_VERSION
   - cmd: echo %APP_VERSION%
   - cmd: echo %NUMBER_OF_PROCESSORS%
-  - cmd: GenerateCMakeFiles.sh "MINGW"
+  - cmd: GenerateCMakeFiles.sh "Windows"
   - cmd: mkdir build.%MSYSTEM%
   - cmd: cd build.%MSYSTEM%
   - cmd: cmake -G "Unix Makefiles" -DOPENSSL_ROOT_DIR=C:\msys64\%MSYSTEM% ..

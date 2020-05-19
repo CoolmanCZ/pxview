@@ -6,9 +6,10 @@
 # *~
 .svn
 
+*.Debug.Debug_Full.*
+app/PxView/upp_git-*
 app/PxView/PxView
 
-*.Debug.Debug_Full.*
 build.*
 
 CMakeLists.txt
