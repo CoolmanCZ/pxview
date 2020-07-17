@@ -1,7 +1,7 @@
 #!/bin/bash
 
 path="app/PxView"
-files=`ls ${path}/*.{h,cpp}`
+files=`find ${path} -path ${path}/lib -prune -type f -o -name "*.cpp" -o -name "*.h"`
 
 for i in ${files}; do
 	if [[ "${i}" =~ "Common.h" ]]; then
