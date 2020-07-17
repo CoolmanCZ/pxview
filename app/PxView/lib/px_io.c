@@ -17,7 +17,7 @@
  * Create a new stream
  */
 pxstream_t *px_stream_new(pxdoc_t *pxdoc) {
-	pxstream_t *pxs;
+	pxstream_t *pxs = NULL;
 	if(pxdoc == NULL) {
 		px_error(pxdoc, PX_RuntimeError, _("Did not pass a paradox database."));
 		return NULL;
@@ -38,7 +38,7 @@ pxstream_t *px_stream_new(pxdoc_t *pxdoc) {
  * Create a gsf stream
  */
 pxstream_t *px_stream_new_gsf(pxdoc_t *pxdoc, int mode, int close, GsfInput *gsf) {
-	pxstream_t *pxs;
+	pxstream_t *pxs = NULL;
 
 	if(NULL == (pxs = px_stream_new(pxdoc)))
 		return(NULL);
@@ -62,10 +62,11 @@ pxstream_t *px_stream_new_gsf(pxdoc_t *pxdoc, int mode, int close, GsfInput *gsf
  * Create a file stream
  */
 pxstream_t *px_stream_new_file(pxdoc_t *pxdoc, int mode, int close, FILE *fp) {
-	pxstream_t *pxs;
+	pxstream_t *pxs = NULL;
 
-	if(NULL == (pxs = px_stream_new(pxdoc)))
+	if(NULL == (pxs = px_stream_new(pxdoc))) {
 		return(NULL);
+	}
 
 	pxs->type = pxfIOFile;
 	pxs->mode = mode;
@@ -88,10 +89,14 @@ pxstream_t *px_stream_new_file(pxdoc_t *pxdoc, int mode, int close, FILE *fp) {
  * file data.
  */
 ssize_t px_read(pxdoc_t *p, pxstream_t *dummy, size_t len, void *buffer) {
-	size_t ret;
-	long blocknr, blockpos, curpos, blocksize;
-	pxhead_t *pxh;
-	pxstream_t *pxs;
+	(void)dummy;
+	size_t ret = 0;
+	long blocknr = 0;
+	long blockpos = 0;
+	long curpos = 0;
+	long blocksize = 0;
+	pxhead_t *pxh = NULL;
+	pxstream_t *pxs = NULL;
 
 	pxh = p->px_head;
 	pxs = p->px_stream;
@@ -136,7 +141,7 @@ ssize_t px_read(pxdoc_t *p, pxstream_t *dummy, size_t len, void *buffer) {
 //			fprintf(stderr, "block %d already in cache.\n", blocknr);
 		}
 		memcpy(buffer, p->curblock+blockpos, len);
-		pxs->seek(p, pxs, curpos+len, SEEK_SET);
+		pxs->seek(p, pxs, curpos + (long)len, SEEK_SET);
 		ret = len;
 	} else {
 		ret = pxs->read(p, pxs, len, buffer);
@@ -148,6 +153,7 @@ ssize_t px_read(pxdoc_t *p, pxstream_t *dummy, size_t len, void *buffer) {
 /* px_seek() {{{
  */
 int px_seek(pxdoc_t *p, pxstream_t *dummy, long offset, int whence) {
+	(void)dummy;
 	return(p->px_stream->seek(p, p->px_stream, offset, whence));
 }
 /* }}} */
@@ -155,6 +161,7 @@ int px_seek(pxdoc_t *p, pxstream_t *dummy, long offset, int whence) {
 /* px_tell() {{{
  */
 long px_tell(pxdoc_t *p, pxstream_t *dummy) {
+	(void)dummy;
 	return(p->px_stream->tell(p, p->px_stream));
 }
 /* }}} */
@@ -162,10 +169,14 @@ long px_tell(pxdoc_t *p, pxstream_t *dummy) {
 /* px_write() {{{
  */
 ssize_t px_write(pxdoc_t *p, pxstream_t *dummy, size_t len, void *buffer) {
-	size_t ret;
-	long blocknr, blockpos, curpos, blocksize;
-	pxhead_t *pxh;
-	pxstream_t *pxs;
+	(void)dummy;
+	size_t ret = 0;
+	long blocknr = 0;
+	long blockpos = 0;
+	long curpos = 0;
+	long blocksize = 0;
+	pxhead_t *pxh = NULL;
+	pxstream_t *pxs = NULL;
 
 	pxh = p->px_head;
 	pxs = p->px_stream;
@@ -215,7 +226,7 @@ ssize_t px_write(pxdoc_t *p, pxstream_t *dummy, size_t len, void *buffer) {
 		p->curblocknr = blocknr;
 		p->curblockdirty = px_true;
 		memcpy(p->curblock+blockpos, buffer, len);
-		pxs->seek(p, pxs, curpos+len, SEEK_SET);
+		pxs->seek(p, pxs, curpos + (long)len, SEEK_SET);
 		ret = len;
 	} else {
 		ret = pxs->write(p, pxs, len, buffer);
@@ -227,9 +238,10 @@ ssize_t px_write(pxdoc_t *p, pxstream_t *dummy, size_t len, void *buffer) {
 /* px_flush() {{{
  */
 int px_flush(pxdoc_t *p, pxstream_t *dummy) {
-	long blocksize;
-	pxhead_t *pxh;
-	pxstream_t *pxs;
+	(void)dummy;
+	long blocksize = 0;
+	pxhead_t *pxh = NULL;
+	pxstream_t *pxs = NULL;
 
 	pxh = p->px_head;
 	pxs = p->px_stream;
@@ -259,20 +271,23 @@ int px_flush(pxdoc_t *p, pxstream_t *dummy) {
  */
 #define BLOCKSIZEEXP 8 /* Each encrypted block has 2^BLOCKSIZEEXP bytes */
 ssize_t px_mb_read(pxblob_t *p, pxstream_t *dummy, size_t len, void *buffer) {
-	pxdoc_t *pxdoc;
-	pxhead_t *pxh;
-	pxstream_t *pxs;
-	long pos;
-	int ret;
+	(void)dummy;
+	pxdoc_t *pxdoc = NULL;
+	pxhead_t *pxh = NULL;
+	pxstream_t *pxs = NULL;
+	long pos = 0;
+	int ret = 0;
 	unsigned char *tmpbuf = NULL;
-	unsigned int blockslen, blockoffset;
+	unsigned int blockslen = 0;
+	unsigned int blockoffset = 0;
 
 	pxdoc = p->pxdoc;
 	pxh = pxdoc->px_head;
 	pxs = p->mb_stream;
 
-	if (pxh->px_encryption == 0)
+	if (pxh->px_encryption == 0) {
 		return pxs->read(pxdoc, pxs, len, buffer);
+	}
 
 	pos = pxs->tell(pxdoc, pxs);
 	if (pos < 0) {
@@ -288,14 +303,15 @@ ssize_t px_mb_read(pxblob_t *p, pxstream_t *dummy, size_t len, void *buffer) {
 	 * e.g. if we want to read 20 bytes starting at position 300 in the
 	 * file, we will need to read 44+20 bytes starting at position 256. 
 	 */
-	blockslen = len + pos - blockoffset;
+	blockslen = (unsigned)len + pos - blockoffset;
 	/* Check if the end of the data is within a 2^BLOCKSIZEEXP bytes block.
 	 * If that is the case, we will need to read the remainder of the
 	 * 2^BLOCKSIZEEXP bytes block as well. In the above example, we
 	 * will have to read 256 bytes instead of just 64.
 	 */
-	if(blockslen & 0xff)
+	if(blockslen & 0xff) {
 		blockslen = ((blockslen >> BLOCKSIZEEXP) + 1) << BLOCKSIZEEXP;
+	}
 
 	assert(blockslen >= len);
 	assert(blockoffset <= (unsigned long)pos);
@@ -312,7 +328,7 @@ ssize_t px_mb_read(pxblob_t *p, pxstream_t *dummy, size_t len, void *buffer) {
 		if(blockoffset == p->blockcache.start && blockslen <= p->blockcache.size) {
 //			fprintf(stderr, "Reading block at position 0x%X from cache.\n", blockoffset);
 			memcpy(buffer, p->blockcache.data + (pos - blockoffset), len);
-			ret = pxs->seek(pxdoc, pxs, pos + len, SEEK_SET);
+			ret = pxs->seek(pxdoc, pxs, pos + (long)len, SEEK_SET);
 			if (ret < 0) {
 				return ret;
 			}
@@ -326,7 +342,7 @@ ssize_t px_mb_read(pxblob_t *p, pxstream_t *dummy, size_t len, void *buffer) {
 //	fprintf(stderr, "Reading block at position 0x%X from file.\n", blockoffset);
 	tmpbuf = p->blockcache.data;
 
-	ret = pxs->read(pxdoc, pxs, blockslen, tmpbuf);
+	ret = (int)pxs->read(pxdoc, pxs, blockslen, tmpbuf);
 	if (ret <= 0) {
 		free(tmpbuf);
 		p->blockcache.data = NULL;
@@ -338,7 +354,7 @@ ssize_t px_mb_read(pxblob_t *p, pxstream_t *dummy, size_t len, void *buffer) {
 	p->blockcache.size = blockslen;
 //	free(tmpbuf);
 
-	ret = pxs->seek(pxdoc, pxs, pos + len, SEEK_SET);
+	ret = pxs->seek(pxdoc, pxs, pos + (long)len, SEEK_SET);
 	if (ret < 0) {
 		return ret;
 	}
@@ -351,6 +367,7 @@ ssize_t px_mb_read(pxblob_t *p, pxstream_t *dummy, size_t len, void *buffer) {
 /* px_mb_seek() {{{
  */
 int px_mb_seek(pxblob_t *p, pxstream_t *dummy, long offset, int whence) {
+	(void)dummy;
 	return(p->mb_stream->seek(p->pxdoc, p->mb_stream, offset, whence));
 }
 /* }}} */
@@ -358,6 +375,7 @@ int px_mb_seek(pxblob_t *p, pxstream_t *dummy, long offset, int whence) {
 /* px_mb_tell() {{{
  */
 long px_mb_tell(pxblob_t *p, pxstream_t *dummy) {
+	(void)dummy;
 	return(p->mb_stream->tell(p->pxdoc, p->mb_stream));
 }
 /* }}} */
@@ -365,6 +383,7 @@ long px_mb_tell(pxblob_t *p, pxstream_t *dummy) {
 /* px_mb_write() {{{
  */
 ssize_t px_mb_write(pxblob_t *p, pxstream_t *dummy, size_t len, void *buffer) {
+	(void)dummy;
 	return(p->mb_stream->write(p->pxdoc, p->mb_stream, len, buffer));
 }
 /* }}} */
@@ -373,6 +392,7 @@ ssize_t px_mb_write(pxblob_t *p, pxstream_t *dummy, size_t len, void *buffer) {
 /* px_fread() {{{
  */
 ssize_t px_fread(pxdoc_t *p, pxstream_t *stream, size_t len, void *buffer) {
+	(void)p;
 	return(fread(buffer, 1, len, stream->s.fp));
 }
 /* }}} */
@@ -380,6 +400,7 @@ ssize_t px_fread(pxdoc_t *p, pxstream_t *stream, size_t len, void *buffer) {
 /* px_fseek() {{{
  */
 int px_fseek(pxdoc_t *p, pxstream_t *stream, long offset, int whence) {
+	(void)p;
 	return(fseek(stream->s.fp, offset, whence));
 }
 /* }}} */
@@ -387,6 +408,7 @@ int px_fseek(pxdoc_t *p, pxstream_t *stream, long offset, int whence) {
 /* px_ftell() {{{
  */
 long px_ftell(pxdoc_t *p, pxstream_t *stream) {
+	(void)p;
 	return(ftell(stream->s.fp));
 }
 /* }}} */
@@ -394,6 +416,7 @@ long px_ftell(pxdoc_t *p, pxstream_t *stream) {
 /* px_fwrite() {{{
  */
 ssize_t px_fwrite(pxdoc_t *p, pxstream_t *stream, size_t len, void *buffer) {
+	(void)p;
 	return(fwrite(buffer, 1, len, stream->s.fp));
 }
 /* }}} */

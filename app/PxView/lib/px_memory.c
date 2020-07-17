@@ -9,14 +9,19 @@
 #include "px_error.h"
 
 void *_px_malloc(pxdoc_t *p, size_t len, const char *caller) {
+	(void)p;
+	(void)caller;
 	return((void *) malloc(len));
 }
 
 void *_px_realloc(pxdoc_t *p, void *mem, size_t len, const char *caller) {
+	(void)p;
+	(void)caller;
 	return((void *) realloc(mem, len));
 }
 
 void _px_free(pxdoc_t *p, void *ptr) {
+	(void)p;
 	free(ptr);
 	ptr = NULL;
 }
@@ -26,8 +31,9 @@ size_t px_strlen(const char *str) {
 }
 
 char *px_strdup(pxdoc_t *p, const char *str) {
-	size_t len;
-	char *buf;
+	(void)p;
+	size_t len = 0;
+	char *buf = NULL;
 
 	if (str == NULL) {
 		px_error(p, PX_Warning, _("Passed NULL string to px_strdup()."));

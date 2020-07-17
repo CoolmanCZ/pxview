@@ -27,10 +27,10 @@ PX_mp_init() {
 
 PXLIB_API void * PXLIB_CALL
 PX_mp_malloc(pxdoc_t *p, size_t size, const char *caller) {
-	void *a;
-	int i;
+	(void)p;
+	void *a = NULL;
+	int i = 0;
 	a = (void *) malloc(size);
-	i = 0;
 	while((i < MAXMEM) && (memlist[i].ptr != NULL)) {
 		i++;
 	}
@@ -39,8 +39,8 @@ PX_mp_malloc(pxdoc_t *p, size_t size, const char *caller) {
 		fprintf(stderr, "\n");
 	}
 	memlist[i].ptr = a;
-	memlist[i].size = size;
-	summem += size;
+	memlist[i].size = (int)size;
+	summem += (int)size;
 	peakmem = (summem > peakmem) ? summem : peakmem;
 	memlist[i].caller = strdup(caller);
 	return(a);
@@ -48,15 +48,16 @@ PX_mp_malloc(pxdoc_t *p, size_t size, const char *caller) {
 
 PXLIB_API void * PXLIB_CALL
 PX_mp_realloc(pxdoc_t *p, void *mem, size_t size, const char *caller) {
-	void *a;
-	int i;
+	(void)p;
+	void *a = NULL;
+	int i = 0;
 	a = realloc(mem, size);
 	for(i=0; i<MAXMEM; i++) {
 		if(memlist[i].ptr == mem) {
 			memlist[i].ptr = a;
 			summem -= memlist[i].size;
-			summem += size;
-			memlist[i].size = size;
+			summem += (int)size;
+			memlist[i].size = (int)size;
 			free(memlist[i].caller);
 			memlist[i].caller = strdup(caller);
 		}
@@ -70,8 +71,8 @@ PX_mp_realloc(pxdoc_t *p, void *mem, size_t size, const char *caller) {
 
 PXLIB_API void PXLIB_CALL
 PX_mp_free(pxdoc_t *p, void *mem) {
-	int i;
-	i = 0;
+	(void)p;
+	int i = 0;
 	while((i < MAXMEM) && (memlist[i].ptr != mem)) {
 		i++;
 	}
@@ -89,8 +90,8 @@ PX_mp_free(pxdoc_t *p, void *mem) {
 
 PXLIB_API void PXLIB_CALL
 PX_mp_list_unfreed() {
-	int i, j;
-	i = j = 0;
+	int i = 0;
+	int j = 0;
 	while(i < MAXMEM) {
 		if(memlist[i].ptr) {
 			fprintf(stderr, _("%d. Memory at address 0x%p (%d) not freed: '%s'."), j, memlist[i].ptr, memlist[i].size, memlist[i].caller);

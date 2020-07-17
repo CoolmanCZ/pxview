@@ -141,7 +141,8 @@ static void px_encrypt_chunk(unsigned char src[256], unsigned char dst[256],
                              unsigned char c, unsigned char d)
 {
 	unsigned char tmp[256];
-	register int x, y;
+	register int x = 0;
+	register int y = 0;
 
 	for (x = 0; x < 256; ++x) {
 		y = (encryption_table_c[x] - d) & 0xff;
@@ -160,15 +161,16 @@ void px_encrypt_db_block(unsigned char *src, unsigned char *dest,
                          unsigned long encryption, unsigned long blocksize,
                          unsigned long blockno)
 {
-	unsigned int chunk;
-	unsigned char a,b;
+	unsigned int chunk = 0;
+	unsigned char a = 0;
+	unsigned char b = 0;
 
 	a = encryption & 0xff;
 	b = (encryption >> 8) & 0xff;
 	blocksize >>= 8;
 
 	for (chunk = 0; chunk < blocksize; ++chunk) {
-		px_encrypt_chunk(src + (chunk << 8), dest + (chunk << 8), a, b, chunk, blockno);
+		px_encrypt_chunk(src + (chunk << 8), dest + (chunk << 8), a, b, chunk, (unsigned char)blockno);
 	}
 }
 /* }}} */
@@ -178,8 +180,9 @@ void px_encrypt_db_block(unsigned char *src, unsigned char *dest,
 void px_encrypt_mb_block(unsigned char *src, unsigned char *dest,
                          unsigned long encryption, unsigned long blocksize)
 {
-	unsigned int chunk;
-	unsigned char a,b;
+	unsigned int chunk = 0;
+	unsigned char a = 0;
+	unsigned char b = 0;
 
 	a = encryption & 0xFF;
 	b = (encryption >> 8) & 0xFF;
@@ -199,7 +202,8 @@ static void px_decrypt_chunk(unsigned char src[256], unsigned char dst[256],
                              unsigned char c, unsigned char d)
 {
 	unsigned char tmp[256];
-	register int x, y;
+	register int x = 0;
+	register int y = 0;
 
 	for (x = 0; x < 256; ++x) {
 		y = (encryption_table_c[x] - d) & 0xff;
@@ -218,15 +222,16 @@ void px_decrypt_db_block(unsigned char *src, unsigned char *dest,
                          unsigned long encryption, unsigned long blocksize,
                          unsigned long blockno)
 {
-	unsigned int chunk;
-	unsigned char a,b;
+	unsigned int chunk = 0;
+	unsigned char a = 0;
+	unsigned char b = 0;
 
 	a = encryption & 0xff;
 	b = (encryption >> 8) & 0xff;
 	blocksize >>= 8;
 
 	for (chunk = 0; chunk < blocksize; ++chunk) {
-		px_decrypt_chunk(src + (chunk << 8), dest + (chunk << 8), a, b, chunk, blockno);
+		px_decrypt_chunk(src + (chunk << 8), dest + (chunk << 8), a, b, chunk, (unsigned char)blockno);
 	}
 }
 /* }}} */
@@ -236,8 +241,9 @@ void px_decrypt_db_block(unsigned char *src, unsigned char *dest,
 void px_decrypt_mb_block(unsigned char *src, unsigned char *dest,
                          unsigned long encryption, unsigned long blocksize)
 {
-	unsigned int chunk;
-	unsigned char a,b;
+	unsigned int chunk = 0;
+	unsigned char a = 0;
+	unsigned char b = 0;
 
 	a = encryption & 0xFF;
 	b = (encryption >> 8) & 0xFF;
@@ -255,7 +261,9 @@ void px_decrypt_mb_block(unsigned char *src, unsigned char *dest,
 static void px_encrypt_chunk2(unsigned char src[256], unsigned char dst[256],
                        int lenpassw) {
 	unsigned char tmp[256];
-	register int i, x, y;
+	register int i = 0;
+	register int x = 0;
+	register int y = 0;
 	memcpy(tmp, src, 256);
 	for(i=lenpassw; i<256; i++) {
 		x = tmp[i-lenpassw];
@@ -269,10 +277,11 @@ static void px_encrypt_chunk2(unsigned char src[256], unsigned char dst[256],
 /* makeLongFromBuff() {{{
  */
 static long makeLongFromBuff(long partial, unsigned char buff[256]) {
-	long i, x, y, z, result;
-	i = 0;
-	y = 0;
-	z = 0;
+	long i = 0;
+	long x = 0;
+	long y = 0;
+	long z = 0;
+	long result = 0;
 	while(i <= 255) {
 		x = buff[i];
 		y = y ^ x;
@@ -282,7 +291,9 @@ static long makeLongFromBuff(long partial, unsigned char buff[256]) {
 		i++;
 	}
 	result = (z << 8) | y;
-	if(result == 0) result = 1;
+	if(result == 0) {
+		result = 1;
+	}
 	result = (result << 16) | partial;
 	return(result);
 }
@@ -295,18 +306,24 @@ static long makeLongFromBuff(long partial, unsigned char buff[256]) {
  */
 long px_passwd_checksum(const char *aPsw) {
 	unsigned char buff[256];
-	long len, count, partial, x, y;
+	long len = 0;
+	long count = 0;
+	long partial = 0;
+	long x = 0;
+	long y = 0;
 
-	if(aPsw == NULL || aPsw[0] == '\0')
+	if(aPsw == NULL || aPsw[0] == '\0') {
 		return 0;
-	len = strlen(aPsw);
+	}
+	len = (long)strlen(aPsw);
 	count = 256;
 	while(count >= len) {
 		memcpy(&buff[256-count], aPsw, len);
 		count -= len;
 	}
-	if(count > 0)
+	if(count > 0) {
 		memcpy(&buff[256-count], aPsw, count);
+	}
 	px_encrypt_chunk(buff, buff, buff[0], buff[1], buff[2], buff[3]);
 	x = buff[0];
 	y = buff[1];

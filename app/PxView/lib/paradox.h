@@ -15,6 +15,11 @@
 
 #ifdef WIN32
 
+#if defined(_MSC_VER)
+#include <BaseTsd.h>
+typedef SSIZE_T ssize_t;
+#endif
+
 #define PXLIB_CALL __cdecl
 
 #ifdef PXLIB_EXPORTS
@@ -346,10 +351,10 @@ PXLIB_API int PXLIB_CALL
 PX_open_file(pxdoc_t *pxdoc, const char *filename);
 
 PXLIB_API int PXLIB_CALL
-PX_create_file(pxdoc_t *pxdoc, pxfield_t *pxf, int numfields, const char *filename, int type);
+PX_create_file(pxdoc_t *pxdoc, pxfield_t *fields, int numfields, const char *filename, int type);
 
 PXLIB_API int PXLIB_CALL
-PX_create_fp(pxdoc_t *pxdoc, pxfield_t *pxf, int numfields, FILE *fp, int type);
+PX_create_fp(pxdoc_t *pxdoc, pxfield_t *fields, int numfields, FILE *fp, int type);
 
 PXLIB_API void* PXLIB_CALL
 PX_get_opaque(pxdoc_t *pxdoc);
@@ -400,7 +405,7 @@ PXLIB_API pxfield_t* PXLIB_CALL
 PX_get_fields(pxdoc_t *pxdoc);
 
 PXLIB_API pxfield_t* PXLIB_CALL
-PX_get_field(pxdoc_t *pxdoc, int i);
+PX_get_field(pxdoc_t *pxdoc, int fieldno);
 
 PXLIB_API int PXLIB_CALL
 PX_get_num_fields(pxdoc_t *pxdoc);
@@ -445,19 +450,19 @@ PXLIB_API pxblob_t* PXLIB_CALL
 PX_new_blob(pxdoc_t *pxdoc);
 
 PXLIB_API int PXLIB_CALL
-PX_open_blob_fp(pxblob_t *pxdoc, FILE *fp);
+PX_open_blob_fp(pxblob_t *pxblob, FILE *fp);
 
 PXLIB_API int PXLIB_CALL
-PX_open_blob_file(pxblob_t *pxdoc, const char *filename);
+PX_open_blob_file(pxblob_t *pxblob, const char *filename);
 
 PXLIB_API int PXLIB_CALL
-PX_create_blob_fp(pxblob_t *pxdoc, FILE *fp);
+PX_create_blob_fp(pxblob_t *pxblob, FILE *fp);
 
 PXLIB_API int PXLIB_CALL
 PX_create_blob_file(pxblob_t *pxblob, const char *filename);
 
 PXLIB_API void PXLIB_CALL
-PX_close_blob(pxblob_t *pxdoc);
+PX_close_blob(pxblob_t *pxblob);
 
 PXLIB_API void PXLIB_CALL
 PX_delete_blob(pxblob_t *pxblob);

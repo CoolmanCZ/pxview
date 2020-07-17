@@ -150,7 +150,7 @@ void PxRecordView::EditData() {
 	editcolumn.WhenClose = editcolumn.Rejector(IDCANCEL);
 
 	// set edit layout based on value type
-	Ctrl *c;
+	Ctrl *c = nullptr;
 	EditInt ei;
 	EditString es;
 	EditDouble ed;
@@ -158,22 +158,29 @@ void PxRecordView::EditData() {
 	DropTime etime;
 
 	dword type = data.GetType();
-	if (type == INT_V) {
+	switch (type) {
+	case INT_V:
 		c = &ei;
-	} else if (type == BOOL_V) {
+		break;
+	case BOOL_V:
 		c = &es;
-	} else if (type == DOUBLE_V) {
+		break;
+	case DOUBLE_V:
 		c = &ed;
-	} else if (type == DATE_V) {
+		break;
+	case DATE_V:
 		c = &edate;
-	} else if (type == TIME_V) {
+		break;
+	case TIME_V:
 		c = &etime;
-	} else {
+		break;
+	default:
 		c = &es;
+		break;
 	}
 
 	editcolumn.Add(*c);
-	c->HSizePosZ(4, 4);  // NOLINT: position
+	c->HSizePosZ(4, 4);	 // NOLINT: position
 	c->VSizePosZ(4, 28); // NOLINT: position
 	c->SetData(data);
 
@@ -421,8 +428,8 @@ int PxRecordView::SendData(const Json &data, const String &url, const String &au
 }
 
 void PxRecordView::ExportJson() {
-	bool upload;
-	bool checkError;
+	bool upload = false;
+	bool checkError = false;
 	String url;
 	String authorization;
 	GetUrl(upload, url, authorization, checkError);
@@ -437,8 +444,8 @@ void PxRecordView::ExportJson() {
 }
 
 void PxRecordView::ExportAllJson() {
-	bool upload;
-	bool checkError;
+	bool upload = false;
+	bool checkError = false;
 	String url;
 	String authorization;
 	GetUrl(upload, url, authorization, checkError);

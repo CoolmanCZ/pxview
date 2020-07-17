@@ -16,8 +16,8 @@ class ParadoxSession {
 	virtual ~ParadoxSession();
 
 	virtual bool IsOpen() const {
-		return open && (NULL != pxdoc->px_stream ||
-						(NULL != pxdoc->px_blob && NULL != pxdoc->px_blob->mb_stream));
+		return open && (nullptr != pxdoc->px_stream ||
+						(nullptr != pxdoc->px_blob && nullptr != pxdoc->px_blob->mb_stream));
 	}
 
 	virtual Vector<String> EnumUsers() {
@@ -36,10 +36,10 @@ class ParadoxSession {
 	virtual Vector<SqlColumnInfo> EnumColumns(String database, String table);
 
 	virtual bool IsBlobOpen() const {
-		return (NULL != pxdoc->px_blob && NULL != pxdoc->px_blob->mb_stream);
+		return (nullptr != pxdoc->px_blob && nullptr != pxdoc->px_blob->mb_stream);
 	}
 
-	virtual bool IsBlob() const { return NULL != pxdoc->px_blob; }
+	virtual bool IsBlob() const { return nullptr != pxdoc->px_blob; }
 
   private:
 	bool open = false;
@@ -67,62 +67,62 @@ class ParadoxSession {
 	int GetNumFields() const { return PX_get_num_fields(pxdoc); }
 
 	String GetTableName() const {
-		char *str;
+		char *str = nullptr;
 		PX_get_parameter(pxdoc, "tablename", &str);
 		return AsString(str);
 	}
 	int GetCodepage() const {
-		float number;
+		float number = 0;
 		PX_get_value(pxdoc, "codepage", &number);
 		return (int)number;
 	}
 	int GetNumRecordsAll() const {
-		float number;
+		float number = 0;
 		PX_get_value(pxdoc, "theonumrecords", &number);
 		return (int)number;
 	}
 	int GetNumBlocks() const {
-		float number;
+		float number = 0;
 		PX_get_value(pxdoc, "numblocks", &number);
 		return (int)number;
 	}
 	int GetFirstBlock() const {
-		float number;
+		float number = 0;
 		PX_get_value(pxdoc, "firstblock", &number);
 		return (int)number;
 	}
 	int GetLastBlock() const {
-		float number;
+		float number = 0;
 		PX_get_value(pxdoc, "lastblock", &number);
 		return (int)number;
 	}
 	int GetHeaderSize() const {
-		float number;
+		float number = 0;
 		PX_get_value(pxdoc, "headersize", &number);
 		return (int)number;
 	}
 	int GetRecordSize() const {
-		float number;
+		float number = 0;
 		PX_get_value(pxdoc, "recordsize", &number);
 		return (int)number;
 	}
 	int GetMaxTableSize() const {
-		float number;
+		float number = 0;
 		PX_get_value(pxdoc, "maxtablesize", &number);
 		return (int)number;
 	}
 	int GetPrimaryKeyField() const {
-		float number;
+		float number = 0;
 		PX_get_value(pxdoc, "primarykeyfields", &number);
 		return (int)number;
 	}
 	int GetAutoInc() const {
-		float number;
+		float number = 0;
 		PX_get_value(pxdoc, "autoinc", &number);
 		return (int)number;
 	}
 	int GetFileType() const {
-		float number;
+		float number = 0;
 		PX_get_value(pxdoc, "filetype", &number);
 		return (int)number;
 	}

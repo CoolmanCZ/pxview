@@ -8,8 +8,10 @@
  * Default error handler if not set by application
  */
 void px_errorhandler(pxdoc_t *p, int error, const char *str, void *data) {
-	if(error != PX_Warning || p->warnings == px_true)
+	(void)data;
+	if(error != PX_Warning || p->warnings == px_true) {
 		printf("PXLib: %s\n", str);
+	}
 }
 /* }}} */
 
@@ -23,8 +25,9 @@ void px_error(pxdoc_t *p, int type, const char *fmt, ...) {
 	va_start(ap, fmt);
 	vsprintf(msg, fmt, ap);
 
-	if(p->errorhandler)
+	if(p->errorhandler) {
 		(p->errorhandler)(p, type, msg, p->errorhandler_user_data);
+	}
 
 	va_end(ap);
 }

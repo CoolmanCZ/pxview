@@ -32,40 +32,30 @@ bool ParadoxSession::Open(const char *filename) {
 
 dword ParadoxSession::GetInfoType(char px_ftype) {
 	switch (px_ftype) {
-	case pxfAlpha:
-		return STRING_V;
 	case pxfDate:
 		return DATE_V;
 	case pxfShort:
-		return INT_V;
 	case pxfLong:
+	case pxfAutoInc:
+	case pxfBytes:
 		return INT_V;
 	case pxfCurrency:
-		return DOUBLE_V;
 	case pxfNumber:
 		return DOUBLE_V;
 	case pxfLogical:
 		return BOOL_V;
 	case pxfMemoBLOb:
-		return VALUE_V;
 	case pxfBLOb:
-		return VALUE_V;
 	case pxfFmtMemoBLOb:
-		return VALUE_V;
 	case pxfOLE:
-		return VALUE_V;
 	case pxfGraphic:
 		return VALUE_V;
+	case pxfAlpha:
 	case pxfTime:
+	case pxfBCD:
 		return STRING_V;
 	case pxfTimestamp:
 		return TIME_V;
-	case pxfAutoInc:
-		return INT_V;
-	case pxfBCD:
-		return STRING_V;
-	case pxfBytes:
-		return INT_V;
 	default:
 		return UNKNOWN_V;
 	}
@@ -78,10 +68,10 @@ String ParadoxSession::GetFileTypeName() const {
 		{2, "non-indexed .DB data file"},				   // NOLINT: map index
 		{3, "non-incrementing secondary index .Xnn file"}, // NOLINT: map index
 		{4, "secondary index .Ynn file (inc or non-inc)"}, // NOLINT: map index
-		{5, "incrementing secondary index .Xnn file"},	 // NOLINT: map index
+		{5, "incrementing secondary index .Xnn file"},	   // NOLINT: map index
 		{6, "non-incrementing secondary index .XGn file"}, // NOLINT: map index
 		{7, "secondary index .YGn file (inc or non inc)"}, // NOLINT: map index
-		{8, "incrementing secondary index .XGn file"},	 // NOLINT: map index
+		{8, "incrementing secondary index .XGn file"},	   // NOLINT: map index
 	};
 
 	return type.Get(GetFileType(), "Unknown file type");
@@ -142,7 +132,7 @@ Vector<Value> ParadoxSession::GetRow(int row, byte charset) {
 		Value val;
 		switch (pxf->px_ftype) {
 		case pxfAlpha: {
-			char *value;
+			char *value = nullptr;
 			if (0 < PX_get_data_alpha(pxdoc, &data[offset], pxf->px_flen, &value)) {
 				val = Upp::ToUnicode(value, codepage);
 				pxdoc->free(pxdoc, value);
@@ -151,7 +141,7 @@ Vector<Value> ParadoxSession::GetRow(int row, byte charset) {
 			break;
 		}
 		case pxfDate: {
-			long value;
+			long value = 0;
 			if (0 < PX_get_data_long(pxdoc, &data[offset], pxf->px_flen, &value)) {
 				Date d;
 				if (value > 0) {
@@ -167,7 +157,7 @@ Vector<Value> ParadoxSession::GetRow(int row, byte charset) {
 			break;
 		}
 		case pxfShort: {
-			short int value;
+			short int value = 0;
 			if (0 < PX_get_data_short(pxdoc, &data[offset], pxf->px_flen, &value)) {
 				val = value;
 			}
@@ -176,7 +166,7 @@ Vector<Value> ParadoxSession::GetRow(int row, byte charset) {
 		}
 		case pxfAutoInc:
 		case pxfLong: {
-			long value;
+			long value = 0;
 			if (0 < PX_get_data_long(pxdoc, &data[offset], pxf->px_flen, &value)) {
 				val = (int)value;
 			}
@@ -184,7 +174,7 @@ Vector<Value> ParadoxSession::GetRow(int row, byte charset) {
 			break;
 		}
 		case pxfTimestamp: {
-			double value;
+			double value = 0.0;
 			if (0 < PX_get_data_double(pxdoc, &data[offset], pxf->px_flen, &value)) {
 				char const *fmt = "d/m/Y H:i:s";
 				char *str = PX_timestamp2string(pxdoc, value, fmt);
@@ -197,7 +187,7 @@ Vector<Value> ParadoxSession::GetRow(int row, byte charset) {
 			break;
 		}
 		case pxfTime: {
-			long value;
+			long value = 0;
 			if (0 < PX_get_data_long(pxdoc, &data[offset], pxf->px_flen, &value)) {
 				char const *fmt = "H:i:s";
 				char *str = PX_timestamp2string(pxdoc, (double)value, fmt);
@@ -209,7 +199,7 @@ Vector<Value> ParadoxSession::GetRow(int row, byte charset) {
 		}
 		case pxfCurrency:
 		case pxfNumber: {
-			double value;
+			double value = 0.0;
 			if (0 < PX_get_data_double(pxdoc, &data[offset], pxf->px_flen, &value)) {
 				val = value;
 			}
@@ -217,7 +207,7 @@ Vector<Value> ParadoxSession::GetRow(int row, byte charset) {
 			break;
 		}
 		case pxfLogical: {
-			char value;
+			char value = 0;
 			val = false;
 			if (0 < PX_get_data_byte(pxdoc, &data[offset], pxf->px_flen, &value)) {
 				if (value > 0) {
@@ -232,10 +222,10 @@ Vector<Value> ParadoxSession::GetRow(int row, byte charset) {
 		case pxfFmtMemoBLOb:
 		case pxfMemoBLOb:
 		case pxfOLE: {
-			char *blobdata;
-			int mod_nr;
-			int size;
-			int ret;
+			char *blobdata = nullptr;
+			int mod_nr = 0;
+			int size = 0;
+			int ret = 0;
 
 			if (pxf->px_ftype == pxfGraphic) {
 				ret = PX_get_data_graphic(pxdoc, &data[offset], pxf->px_flen, &mod_nr, &size,
@@ -261,7 +251,7 @@ Vector<Value> ParadoxSession::GetRow(int row, byte charset) {
 			break;
 		}
 		case pxfBytes: {
-			char value;
+			char value = 0;
 			if (0 < PX_get_data_byte(pxdoc, &data[offset], pxf->px_fdc, &value)) {
 				val = value;
 			}
@@ -269,7 +259,7 @@ Vector<Value> ParadoxSession::GetRow(int row, byte charset) {
 			break;
 		}
 		case pxfBCD: {
-			char *value;
+			char *value = nullptr;
 			// NOLINTNEXTLINE: C code
 			if (0 < PX_get_data_bcd(pxdoc, (unsigned char *)&data[offset], pxf->px_fdc, &value)) {
 				val = value;
@@ -359,7 +349,7 @@ bool ParadoxSession::SetRowCol(int row, int col, const Value &value) {
 			break;
 		}
 		case pxfShort: {
-			int rec;
+			int rec = 0;
 			if (value.GetType() == INT_V) {
 				rec = value;
 			} else {
@@ -370,7 +360,7 @@ bool ParadoxSession::SetRowCol(int row, int col, const Value &value) {
 		}
 		case pxfAutoInc:
 		case pxfLong: {
-			int rec;
+			int rec = 0;
 			if (value.GetType() == INT_V) {
 				rec = value;
 			} else {
@@ -406,7 +396,7 @@ bool ParadoxSession::SetRowCol(int row, int col, const Value &value) {
 		}
 		case pxfCurrency:
 		case pxfNumber: {
-			double rec;
+			double rec = 0.0;
 			if (value.GetType() == DOUBLE_V) {
 				rec = value;
 			} else {

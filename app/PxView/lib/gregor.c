@@ -142,12 +142,12 @@ SdnToGregorian(
     int      *pMonth,
     int      *pDay)
 {
-	int       century;
-	int       year;
-	int       month;
-	int       day;
-	long int  temp;
-	int       dayOfYear;
+	int       century = 0;
+	int       year = 0;
+	int       month = 0;
+	int       day = 0;
+	long int  temp = 0;
+	int       dayOfYear = 0;
 	
 	if (sdn <= 0) {
 		*pYear = 0;
@@ -181,7 +181,9 @@ SdnToGregorian(
 	
 	/* Adjust to the B.C./A.D. type numbering. */
 	year -= 4800;
-	if (year <= 0) year--;
+	if (year <= 0) {
+		year--;
+	}
 	
 	*pYear = year;
 	*pMonth = month;
@@ -194,8 +196,8 @@ GregorianToSdn(
     int inputMonth,
     int inputDay)
 {
-	int year;
-	int month;
+	int year = 0;
+	int month = 0;
 	
 	/* check for invalid dates */
 	if (inputYear == 0 || inputYear < -4714 ||
