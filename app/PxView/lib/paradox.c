@@ -3587,7 +3587,7 @@ PX_get_data_bytes(pxdoc_t *pxdoc, char *data, int len, char **value) {
 PXLIB_API int PXLIB_CALL
 PX_get_data_double(pxdoc_t *pxdoc, char *data, int len, double *value) {
 	(void)pxdoc;
-	char tmp[8];
+	char tmp[8] = {0};
 	memcpy(&tmp, data, 8);
 	if(tmp[0] & 0x80) {
 		tmp[0] &= 0x7f;
@@ -3612,7 +3612,7 @@ PXLIB_API int PXLIB_CALL
 PX_get_data_long(pxdoc_t *pxdoc, char *data, int len, long *value) {
 	(void)pxdoc;
 	(void)len;
-	char tmp[4];
+	char tmp[8] = {0};
 	memcpy(&tmp, data, 4);
 	if(tmp[0] & 0x80) {
 		tmp[0] &= 0x7f;
@@ -3634,7 +3634,7 @@ PXLIB_API int PXLIB_CALL
 PX_get_data_short(pxdoc_t *pxdoc, char *data, int len, short int *value) {
 	(void)pxdoc;
 	(void)len;
-	char tmp[2];
+	char tmp[4] = {0};
 	memcpy(&tmp, data, 2);
 	if(tmp[0] & 0x80) {
 		tmp[0] &= 0x7f;

@@ -21,10 +21,12 @@ Simply download and unzip appropriate package for your windows version from the 
 The linux binary is not available. You have to build the binary manually and this requires some development tools installed in your linux distribution.
 
 ### Linux Build
-Clone the Gihub repository and execute following commands in the directory where the source code is downloaded
-```
-git submodule init
-git submodule update --recursive --remote --depth 1
+Execute following commands to build linux binary
+
+```bash
+git clone https://github.com/CoolmanCZ/pxview.git
+cd pxview
+git submodule update --init --recursive
 ./GenerateCMakeFiles.sh
 mkdir -p build
 cd build
@@ -39,6 +41,7 @@ After successfull build the binary is stored in the ```build/bin``` directory
 Download latest windows binaries and source code from [GitHub releases](https://github.com/CoolmanCZ/pxview/releases/).
 
 # Changelog
+* 1.1.6 - submodules update, variables initialization
 * 1.1.5 - submodules update, paradox library readability improvement
 * 1.1.4 - submodules update, readability improvement
 * 1.1.3 - submodules update, small code corrections
