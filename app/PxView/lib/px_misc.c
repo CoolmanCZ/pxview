@@ -271,7 +271,7 @@ void px_set_date(char *cp, int year, int month, int day)
 	if (day > 31) {
 		day = 0;
 	}
-	sprintf(cp, "%d", year);
+	snprintf(cp, 9, "%d", year);
 	cp[4] = month / 10 + '0';
 	cp[5] = month % 10 + '0';
 	cp[6] = day / 10 + '0';

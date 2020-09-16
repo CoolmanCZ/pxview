@@ -55,7 +55,9 @@ class ParadoxSession {
 	String blobfilepath;
 
 	static void ErrorHandler(pxdoc_t *p, int error, const char *str, void *data) {
-		PromptOK(Format("PXLib: %s", str));
+		(void)p;
+		(void)data;
+		PromptOK(Format("PXLib: %s (%d)", str, error));
 	}
 	dword GetInfoType(char px_ftype);
 

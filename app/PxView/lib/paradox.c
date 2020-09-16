@@ -267,7 +267,7 @@ PX_set_io_stream(pxdoc_t *pxdoc,
 		px_error(pxdoc, PX_MemoryError, _("Could not create new io stream."));
 		return -1;
 	}
-	
+
 	pxs->read = readproc;
 	pxs->seek = seekproc;
 	pxs->tell = tellproc;
@@ -1930,7 +1930,7 @@ PX_put_recordn(pxdoc_t *pxdoc, char *data, int recpos) {
 		px_error(pxdoc, PX_RuntimeError, _("Inconsistency in writing record into data block. Expected record nr. %d, but got %d. %dth record. %dth data block. %d records per block."), recdatablocknr, itmp, pxh->px_numrecords+1, datablocknr, recsperdatablock);
 		return -1;
 	}
-	
+
 	if(itmp != recdatablocknr) {
 		px_error(pxdoc, PX_Warning, _("Position of record has been recalculated. Requested position was %d, new position is %d."), recpos, (datablocknr-1) * recsperdatablock + itmp);
 	}
@@ -2046,9 +2046,9 @@ PX_retrieve_record(pxdoc_t *pxdoc, int recno) {
 					double value = 0.0;
 					if(0 < PX_get_data_double(pxdoc, &data[offset], pxf->px_flen, &value)) {
 						dataptr[i]->value.dval = value;
-					} 
+					}
 					break;
-					} 
+					}
 				case pxfLogical: {
 					char value = 0;
 					if(0 < PX_get_data_byte(pxdoc, &data[offset], pxf->px_flen, &value)) {
@@ -2249,7 +2249,7 @@ PX_insert_record(pxdoc_t *pxdoc, pxval_t **dataptr) {
 		px_error(pxdoc, PX_RuntimeError, _("Error in writing record into data block."));
 		return -1;
 	}
-	
+
 	pxh->px_numrecords++;
 	put_px_head(pxdoc, pxh, pxdoc->px_stream);
 	return(newrecpos);
@@ -3181,12 +3181,12 @@ PX_create_blob_file(pxblob_t *pxblob, const char *filename) {
  */
 PXLIB_API void PXLIB_CALL
 PX_close_blob(pxblob_t *pxblob) {
-	pxdoc_t *pxdoc = NULL;
-	if(NULL == (pxdoc = pxblob->pxdoc)) {
+	pxdoc_t *pxdoc = pxblob->pxdoc;
+	if(NULL == pxdoc) {
 		px_error(pxdoc, PX_RuntimeError, _("No paradox document associated with blob file."));
 	}
 
-	if(pxblob->mb_stream && pxblob->mb_stream->close && (pxblob->mb_stream->s.fp != NULL)){
+	if(pxdoc && pxblob->mb_stream && pxblob->mb_stream->close && (pxblob->mb_stream->s.fp != NULL)){
 		fclose(pxblob->mb_stream->s.fp);
 		pxdoc->free(pxdoc, pxblob->mb_stream);
 		pxblob->mb_stream = NULL;
@@ -3491,6 +3491,7 @@ PX_get_data_alpha(pxdoc_t *pxdoc, char *data, int len, char **value) {
 	char *buffer = NULL;
 	char *obuf = NULL;
 	size_t olen = 0;
+	int free_obuf = 0;
 
 	if(data[0] == '\0') {
 		*value = NULL;
@@ -3530,30 +3531,37 @@ PX_get_data_alpha(pxdoc_t *pxdoc, char *data, int len, char **value) {
 //		printf("data(%d) = '%s'\n", ilen, data);
 //		printf("obuf(%d) = '%s'\n", olen, obuf);
 		olen = optr-obuf;
+		free_obuf = 1;
 #endif
 #endif
 	} else {
 		olen = len;
+		obuf = data;
 	}
-	obuf = data;
 	/* Copy the encoded string into memory which belongs to pxlib */
 	buffer = (char *) pxdoc->malloc(pxdoc, olen+1, _("Allocate memory for field data."));
 	if(!buffer) {
-		if(pxdoc->targetencoding != NULL) {
+		if(free_obuf == 1) {
 			free(obuf);
 		}
 		*value = NULL;
 		return -1;
 	}
-	memcpy(buffer, obuf, olen);
-	buffer[olen] = '\0';
-	*value = buffer;
+	int ret = 1;
+	if (obuf) {
+		memcpy(buffer, obuf, olen);
+		buffer[olen] = '\0';
+		*value = buffer;
+	} else {
+		*value = NULL;
+		ret = -1;
+	}
 
-	if(pxdoc->targetencoding != NULL) {
+	if(free_obuf == 1) {
 		free(obuf);
 	}
 
-	return 1;
+	return ret;
 }
 /* }}} */
 
@@ -4413,7 +4421,8 @@ PX_make_timestamp(pxdoc_t *pxdoc, int year, int month, int day, int hour, int mi
  */
 PXLIB_API char * PXLIB_CALL
 PX_timestamp2string(pxdoc_t *pxdoc, double value, const char *format) {
-	char tmp_buff[32];
+	int tmp_buff_size = 32;
+	char tmp_buff[tmp_buff_size];
 	char *str = NULL;
 	int i = 0;
 	int size=0;
@@ -4473,35 +4482,35 @@ PX_timestamp2string(pxdoc_t *pxdoc, double value, const char *format) {
 					strcat(str, ch);
 				}
 			case 'Y':		/* year, numeric, 4 digits */
-				sprintf(tmp_buff, "%04d", ta.tm_year);  /* SAFE */
+				snprintf(tmp_buff, tmp_buff_size, "%04d", ta.tm_year);  /* SAFE */
 				strcat(str, tmp_buff);
 				break;
 			case 'z':		/* day (of the year) */
-				sprintf(tmp_buff, "%d", ta.tm_yday);  /* SAFE */
+				snprintf(tmp_buff, tmp_buff_size, "%d", ta.tm_yday);  /* SAFE */
 				strcat(str, tmp_buff);
 				break;
 			case 'y':		/* year, numeric, 2 digits */
-				sprintf(tmp_buff, "%02d", ((ta.tm_year)%100));  /* SAFE */
+				snprintf(tmp_buff, tmp_buff_size, "%02d", ((ta.tm_year)%100));  /* SAFE */
 				strcat(str, tmp_buff);
 				break;
 			case 'm':		/* month, numeric */
-				sprintf(tmp_buff, "%02d", ta.tm_mon + 1);  /* SAFE */
+				snprintf(tmp_buff, tmp_buff_size, "%02d", ta.tm_mon + 1);  /* SAFE */
 				strcat(str, tmp_buff);
 				break;
 			case 'n':      /* month, numeric, no leading zeros */
-				sprintf(tmp_buff, "%d", ta.tm_mon + 1);  /* SAFE */
+				snprintf(tmp_buff, tmp_buff_size, "%d", ta.tm_mon + 1);  /* SAFE */
 				strcat(str, tmp_buff);
 				break;
 			case 'd':		/* day of the month, numeric */
-				sprintf(tmp_buff, "%02d", ta.tm_mday);  /* SAFE */
+				snprintf(tmp_buff, tmp_buff_size, "%02d", ta.tm_mday);  /* SAFE */
 				strcat(str, tmp_buff);
 				break;
 			case 'j':
-				sprintf(tmp_buff, "%d", ta.tm_mday); /* SAFE */
+				snprintf(tmp_buff, tmp_buff_size, "%d", ta.tm_mday); /* SAFE */
 				strcat(str, tmp_buff);
 				break;
 			case 'H':		/* hour, numeric, 24 hour format */
-				sprintf(tmp_buff, "%02d", ta.tm_hour);  /* SAFE */
+				snprintf(tmp_buff, tmp_buff_size, "%02d", ta.tm_hour);  /* SAFE */
 				strcat(str, tmp_buff);
 				break;
 			case 'h': {		/* hour, numeric, 12 hour format */
@@ -4509,12 +4518,12 @@ PX_timestamp2string(pxdoc_t *pxdoc, double value, const char *format) {
 				if (h==0) {
 					h = 12;
 				}
-				sprintf(tmp_buff, "%02d", h);  /* SAFE */
+				snprintf(tmp_buff, tmp_buff_size, "%02d", h);  /* SAFE */
 				strcat(str, tmp_buff);
 				break;
 			}
 			case 'G':      /* hour, numeric, 24 hour format, no leading zeros */
-				sprintf(tmp_buff, "%d", ta.tm_hour);  /* SAFE */
+				snprintf(tmp_buff, tmp_buff_size, "%d", ta.tm_hour);  /* SAFE */
 				strcat(str, tmp_buff);
 				break;
 			case 'g': {     /* hour, numeric, 12 hour format, no leading zeros */
@@ -4522,16 +4531,16 @@ PX_timestamp2string(pxdoc_t *pxdoc, double value, const char *format) {
 				if (h==0) {
 					h = 12;
 				}
-				sprintf(tmp_buff, "%d", h);  /* SAFE */
+				snprintf(tmp_buff, tmp_buff_size, "%d", h);  /* SAFE */
 				strcat(str, tmp_buff);
 				break;
 			}
 			case 'i':		/* minutes, numeric */
-				sprintf(tmp_buff, "%02d", ta.tm_min);  /* SAFE */
+				snprintf(tmp_buff, tmp_buff_size, "%02d", ta.tm_min);  /* SAFE */
 				strcat(str, tmp_buff);
 				break;
 			case 's':		/* seconds, numeric */
-				sprintf(tmp_buff, "%02d", ta.tm_sec);  /* SAFE */
+				snprintf(tmp_buff, tmp_buff_size, "%02d", ta.tm_sec);  /* SAFE */
 				strcat(str, tmp_buff);
 				break;
 			case 'A':		/* AM/PM */
@@ -4561,7 +4570,7 @@ PX_timestamp2string(pxdoc_t *pxdoc, double value, const char *format) {
 				}
 				break;
 			case 'L':		/* boolean for leapyear */
-				sprintf(tmp_buff, "%d", (isleap((ta.tm_year)) ? 1 : 0 ) );
+				snprintf(tmp_buff, tmp_buff_size, "%d", (isleap((ta.tm_year)) ? 1 : 0 ) );
 				strcat(str, tmp_buff);
 				break;
 			default: {

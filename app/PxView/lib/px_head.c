@@ -461,7 +461,8 @@ int put_px_head(pxdoc_t *pxdoc, pxhead_t *pxh, pxstream_t *pxs) {
 		offset = 0;
 		for(i=0; i<pxh->px_numfields; i++, pxf++) {
 			put_long_le((char *)&ptr, base+offset);
-			offset += (int)strlen(pxf->px_fname)+1;
+			if(pxf->px_fname)
+				offset += (int)strlen(pxf->px_fname)+1;
 			if(pxdoc->write(pxdoc, pxs, 4, &ptr) < 1) {
 				px_error(pxdoc, PX_RuntimeError, _("Could not write pointers to field names."));
 				return -1;

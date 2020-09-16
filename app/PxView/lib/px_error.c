@@ -23,7 +23,7 @@ void px_error(pxdoc_t *p, int type, const char *fmt, ...) {
 	va_list ap;
 
 	va_start(ap, fmt);
-	vsprintf(msg, fmt, ap);
+	vsnprintf(msg, 256, fmt, ap);
 
 	if(p->errorhandler) {
 		(p->errorhandler)(p, type, msg, p->errorhandler_user_data);
