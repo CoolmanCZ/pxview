@@ -3,6 +3,7 @@
 
 #include <CtrlLib/CtrlLib.h>
 
+#include "Version.h"
 #include "PxRecordView.h"
 
 namespace Upp {
@@ -19,9 +20,8 @@ namespace Upp {
 
 class PxView : public Upp::WithPxViewLayout<Upp::TopWindow> {
   public:
-	typedef PxView CLASSNAME;
 	PxView();
-	virtual ~PxView(){};
+	~PxView() override{};
 
 	void ShowInfo();
 	void ChangeCharset();
@@ -34,8 +34,6 @@ class PxView : public Upp::WithPxViewLayout<Upp::TopWindow> {
 
 	Upp::FileSel fileSel;
 	Upp::String filePattern;
-
-	Upp::String version;
 
 	Upp::MenuBar menuBar;
 	Upp::StatusBar statusBar;

@@ -12,8 +12,8 @@ csCZ("indexov\303\251 soubory (*.px, *.x*, *.y*)")
 T_("all files")
 csCZ("v\305\241echny soubory")
 
-T_("Exit Paradox database viewer?")
-csCZ("Ukon\304\215it prohl\303\255\305\276e\304\215 paradox datab\303\241ze")
+T_("Exit")
+csCZ("Ukon\304\215it")
 
 T_("Files")
 csCZ("Soubory")
@@ -39,9 +39,6 @@ csCZ("Zav\305\231\303\255t datab\303\241zov\303\275 soubor")
 T_("Close the currently displayed DB file")
 csCZ("Zav\305\231e aktu\303\241ln\304\233 zobrazen\303\275 datab\303\241zov\303\275 "
      "soubor")
-
-T_("Exit")
-csCZ("Ukon\304\215it")
 
 T_("Quit the application")
 csCZ("Ukon\304\215it aplikaci")
@@ -102,9 +99,6 @@ csCZ("Vyberte adres\303\241\305\231 pro ulo\305\276en\303\255 souboru")
 T_("Select directory to save the files")
 csCZ("Vyberte adres\303\241\305\231 pro ulo\305\276en\303\255 soubor\305\257")
 
-T_("Paradox database viewer")
-csCZ("Prohl\303\255\305\276e\304\215 Paradox datab\303\241ze")
-
 T_("Visible rows:")
 csCZ("Zobrazen\303\251 \305\231\303\241dky:")
 
@@ -139,7 +133,7 @@ T_("Chage column data")
 csCZ("Zm\304\233nit data bu\305\210ky")
 
 T_("OK")
-csCZ("")
+csCZ("OK")
 
 T_("Cancel")
 csCZ("Zru\305\241it")
@@ -154,7 +148,7 @@ T_("Select")
 csCZ("Vybrat")
 
 T_("HTTPS url:")
-csCZ("")
+csCZ("HTTPS url:")
 
 T_("Authorization header:")
 csCZ("Autoriza\304\215n\303\255 hlavi\304\215ka")

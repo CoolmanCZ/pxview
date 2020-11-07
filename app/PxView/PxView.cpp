@@ -11,16 +11,14 @@ GUI_APP_MAIN { PxView().Sizeable().Zoomable().Run(); }
 PxView::PxView() {
 	Icon(PxViewImg::AppLogo());
 
-	version = "v1.1.4";
-
 	CtrlLayout(*this);
-	this->WhenClose = THISBACK(Exit);
+	this->WhenClose = [=] { Exit(); };
 
 	AddFrame(menuBar);
 	AddFrame(statusBar);
 
-	tab.WhenSet = THISBACK(CountRows);
-	lang.WhenPush = THISBACK(ToggleLang);
+	tab.WhenSet = [=] { CountRows(); };
+	lang.WhenPush = [=] { ToggleLang(); };
 
 	fileSel.Type(t_("table files (*.db)"), "*.db")
 		.Type(t_("index information files (*.px, *.x*, *.y*)"), "*.px, *.x*, *.y*")
@@ -37,33 +35,33 @@ PxView::PxView() {
 }
 
 void PxView::Exit() {
-	if (PromptOKCancel(t_("Exit Paradox database viewer?")) == 1)
+	if (PromptOKCancel(Format("%s %s?", t_("Exit"), t_(APP_TITLE))) == 1)
 		Close();
 }
 
 void PxView::MakeMenu() {
-	menuBar.Set(THISBACK(MenuMain));
+	menuBar.Set([=](Bar &bar) { MenuMain(bar); });
 	menuBar.WhenHelp = statusBar;
 }
 
 void PxView::MenuMain(Bar &menu) {
-	menu.Add(t_("Files"), THISBACK(MenuFile));
-	menu.Add(t_("Database"), THISBACK(MenuDB));
+	menu.Sub(t_("Files"), [=](Bar &bar) { MenuFile(bar); });
+	menu.Sub(t_("Database"), [=](Bar &bar) { MenuDB(bar); });
 }
 
 void PxView::MenuFile(Bar &menu) {
 	bool enable = tab.GetCount() > 0;
 
-	menu.Add(t_("Open DB file"), CtrlImg::open(), THISBACK(OpenFile))
+	menu.Add(t_("Open DB file"), CtrlImg::open(), [=] { OpenFile(); })
 		.Key(K_CTRL_O)
 		.Help(t_("Open DB file for view"));
-	menu.Add(t_("Open directory"), CtrlImg::open(), THISBACK(OpenDirectory))
+	menu.Add(t_("Open directory"), CtrlImg::open(), [=] { OpenDirectory(); })
 		.Key(K_CTRL_D)
 		.Help(t_("Open all DB files in the selected directory for view"));
-	menu.Add(enable, t_("Close DB file"), CtrlImg::open(), THISBACK(RemoveTab))
+	menu.Add(enable, t_("Close DB file"), CtrlImg::open(), [=] { RemoveTab(); })
 		.Key(K_CTRL_Q)
 		.Help(t_("Close the currently displayed DB file"));
-	menu.Add(t_("Exit"), THISBACK(Exit)).Key(K_CTRL_X).Help(t_("Quit the application"));
+	menu.Add(t_("Exit"), [=] { Exit(); }).Key(K_CTRL_X).Help(t_("Quit the application"));
 }
 
 void PxView::MenuDB(Bar &menu) {
@@ -77,24 +75,24 @@ void PxView::MenuDB(Bar &menu) {
 			enable = true;
 	}
 
-	menu.Add(enable, t_("Show DB info"), THISBACK(ShowInfo));
+	menu.Add(enable, t_("Show DB info"), [=] { ShowInfo(); });
 	menu.Separator();
-	menu.Add(enable, t_("Change characters encoding"), THISBACK(ChangeCharset));
+	menu.Add(enable, t_("Change characters encoding"), [=] { ChangeCharset(); });
 	menu.Separator();
-	menu.Add(enable, t_("Delete current row"), THISBACK(DeleteRow));
+	menu.Add(enable, t_("Delete current row"), [=] { DeleteRow(); });
 	menu.Separator();
-	menu.Add(enable, t_("Export current DB to CSV"), CtrlImg::save(), THISBACK1(SaveAs, csv))
+	menu.Add(enable, t_("Export current DB to CSV"), CtrlImg::save(), [=] { SaveAs(csv); })
 		.Help(t_("Save current DB file in the CSV format to the directory..."));
-	menu.Add(enable, t_("Export all DBs to CSV"), CtrlImg::save(), THISBACK1(SaveAllAs, csv))
+	menu.Add(enable, t_("Export all DBs to CSV"), CtrlImg::save(), [=] { SaveAllAs(csv); })
 		.Help(t_("Save all opened DB files in the CSV format to the directory..."));
 	menu.Separator();
-	menu.Add(enable, t_("Export current DB to JSON"), CtrlImg::save(), THISBACK1(SaveAs, json))
+	menu.Add(enable, t_("Export current DB to JSON"), CtrlImg::save(), [=] { SaveAs(json); })
 		.Help(t_("Save current DB file in the JSON format to the directory..."));
-	menu.Add(enable, t_("Export all DBs to JSON"), CtrlImg::save(), THISBACK1(SaveAllAs, json))
+	menu.Add(enable, t_("Export all DBs to JSON"), CtrlImg::save(), [=] { SaveAllAs(json); })
 		.Help(t_("Save all opened DB files in the JSON format to the directory..."));
 	menu.Separator();
-	menu.Add(enable, t_("Send current row using HTTPS (application/json)"), THISBACK(ExportJson));
-	menu.Add(enable, t_("Send ALL rows using HTTPS (application/json)"), THISBACK(ExportAllJson));
+	menu.Add(enable, t_("Send current row using HTTPS (application/json)"), [=] { ExportJson(); });
+	menu.Add(enable, t_("Send ALL rows using HTTPS (application/json)"), [=] { ExportAllJson(); });
 }
 
 void PxView::OpenFile() {
@@ -137,8 +135,8 @@ void PxView::LoadFile(const String &filePath) {
 	if (px != nullptr) {
 		tab.Add(px->SizePos(), px->GetFileName());
 		tab.Set(tab.GetCount() - 1);
-		px->WhenRemoveTab = THISBACK(RemoveTab);
-		px->WhenSearchCursor = THISBACK(CountRows);
+		px->WhenRemoveTab = [=] { RemoveTab(); };
+		px->WhenSearchCursor = [=] { CountRows(); };
 	}
 }
 
@@ -227,7 +225,7 @@ void PxView::ToggleLang() {
 	}
 	SetLanguage(currentLang);
 
-	Title(Format("%s - %s", t_("Paradox database viewer"), version));
+	Title(Format("%s - %s", t_(APP_TITLE), APP_VERSION_STR));
 	numrows_text.SetText(t_("Visible rows:"));
 
 	MakeMenu();

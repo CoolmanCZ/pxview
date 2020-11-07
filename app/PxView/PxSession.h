@@ -20,19 +20,22 @@ class ParadoxSession {
 						(nullptr != pxdoc->px_blob && nullptr != pxdoc->px_blob->mb_stream));
 	}
 
+	// No users in paradox!
 	virtual Vector<String> EnumUsers() {
 		NEVER();
 		return Vector<String>();
-	} // No users in paradox!
+	}
+	// No databases in paradox!
 	virtual Vector<String> EnumDatabases() {
 		NEVER();
 		return Vector<String>();
-	} // No databases in paradox!
+	}
 	virtual Vector<String> EnumTables(String database);
+	// NOLINTNEXTLINE - No views in paradox!
 	virtual Vector<String> EnumViews(String database) {
 		NEVER();
 		return Vector<String>();
-	} // No views in paradox!
+	}
 	virtual Vector<SqlColumnInfo> EnumColumns(String database, String table);
 
 	virtual bool IsBlobOpen() const {
@@ -144,7 +147,7 @@ class ParadoxSession {
 	char GetModFlags2() const { return pxdoc->px_head->px_modifiedflags2; }
 	bool IsWriteProtected() const { return pxdoc->px_head->px_writeprotected; }
 	int64 GetEncryption() const { return pxdoc->px_head->px_encryption; }
-	double GetFileVersion() const { return pxdoc->px_head->px_fileversion / 10.0; }
+	double GetFileVersion() const { return pxdoc->px_head->px_fileversion / 10.0; } // NOLINT
 
 	void Close() { PX_close(pxdoc); }
 	bool Open(const char *filename);

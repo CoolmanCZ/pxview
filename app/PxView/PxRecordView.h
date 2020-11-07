@@ -10,9 +10,8 @@ enum filetype { csv = 1, json };
 
 class PxRecordView : public Upp::GridCtrl {
   public:
-	typedef PxRecordView CLASSNAME;
 	PxRecordView();
-	virtual ~PxRecordView(){};
+	~PxRecordView() override{};
 
   private:
 	Upp::ParadoxSession px;
@@ -52,7 +51,7 @@ class PxRecordView : public Upp::GridCtrl {
 	Upp::Event<> WhenRemoveTab;
 	void DoRemoveTab() { WhenRemoveTab(); };
 
-	virtual bool IsModified() const { return modified; }
+	bool IsModified() const override { return modified; }
 
 	bool OpenDB(const Upp::String &filePath);
 	bool IsDBOpen() { return px.IsOpen(); }

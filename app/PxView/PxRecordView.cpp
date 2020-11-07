@@ -5,13 +5,13 @@ using namespace Upp;
 PxRecordView::PxRecordView() {
 	modified = false;
 
-	WhenMenuBar = THISBACK(StatusMenuBar);
-	WhenEnter = WhenLeftDouble = THISBACK(EditData);
+	WhenMenuBar = [=](Bar &bar) { StatusMenuBar(bar); };
+	WhenEnter = WhenLeftDouble = [=] { EditData(); };
 
 	httpClient.MaxContentSize(INT_MAX);
-	httpClient.WhenContent = THISBACK(HttpContent);
-	httpClient.WhenWait = httpClient.WhenDo = THISBACK(HttpShowProgress);
-	httpClient.WhenStart = THISBACK(HttpStart);
+	httpClient.WhenContent = [=](const void *ptr, int size) { HttpContent(ptr, size); };
+	httpClient.WhenWait = httpClient.WhenDo = [=] { HttpShowProgress(); };
+	httpClient.WhenStart = [=] { HttpStart(); };
 
 	httpLoaded = 0;
 	httpFileName = "https_received_data.txt";
@@ -36,18 +36,18 @@ PxRecordView::PxRecordView() {
 void PxRecordView::StatusMenuBar(Bar &bar) {
 	bool enable = px.IsOpen();
 
-	bar.Add(enable, t_("Show DB info"), THISBACK(ShowInfo));
-	bar.Add(t_("Close this DB"), THISBACK(DoRemoveTab));
+	bar.Add(enable, t_("Show DB info"), [=] { ShowInfo(); });
+	bar.Add(t_("Close this DB"), [=] { DoRemoveTab(); });
 	bar.Separator();
-	bar.Add(enable, t_("Change characters encoding"), THISBACK(ChangeCharset));
+	bar.Add(enable, t_("Change characters encoding"), [=] { ChangeCharset(); });
 	bar.Separator();
-	bar.Add(enable && editing, t_("Delete current row"), THISBACK(DeleteRow));
+	bar.Add(enable && editing, t_("Delete current row"), [=] { DeleteRow(); });
 	bar.Separator();
-	bar.Add(enable, t_("Export DB as CSV"), THISBACK1(SaveAs, csv));
-	bar.Add(enable, t_("Export DB as JSON"), THISBACK1(SaveAs, json));
+	bar.Add(enable, t_("Export DB as CSV"), [=] { SaveAs(csv); });
+	bar.Add(enable, t_("Export DB as JSON"), [=] { SaveAs(json); });
 	bar.Separator();
-	bar.Add(enable, t_("Send current row using HTTPS (application/json)"), THISBACK(ExportJson));
-	bar.Add(enable, t_("Send ALL rows using HTTPS (application/json)"), THISBACK(ExportAllJson));
+	bar.Add(enable, t_("Send current row using HTTPS (application/json)"), [=] { ExportJson(); });
+	bar.Add(enable, t_("Send ALL rows using HTTPS (application/json)"), [=] { ExportAllJson(); });
 }
 
 bool PxRecordView::OpenDB(const String &filePath) {
@@ -89,20 +89,19 @@ void PxRecordView::ChangeCharset() {
 		return;
 	}
 
-	WithCharSetLayout<TopWindow> dlg;
+	WithCharsetSelectLayout<TopWindow> dlg;
 	CtrlLayout(dlg, t_("Select encoding"));
 
-	dlg.d.Add(CHARSET_UTF8, "UTF8");
+	dlg.charsetDL.Add(CHARSET_UTF8, "UTF8");
 	for (int i = 1; i < CharsetCount(); i++) {
-		dlg.d.Add(i, CharsetName(i));
+		dlg.charsetDL.Add(i, CharsetName(i));
 	}
-	dlg.d.GoBegin();
+	dlg.charsetDL.GoBegin();
 
-	dlg.cancel <<= dlg.Breaker(IDCANCEL);
 	dlg.ok <<= dlg.Breaker(IDOK);
 
 	if (dlg.Run() == IDOK) {
-		String charsetName = dlg.d.GetValue();
+		String charsetName = dlg.charsetDL.GetValue();
 		ReadRecords(CharsetByName(charsetName));
 	}
 }

@@ -15,6 +15,7 @@ file
 	PxRecordView.h,
 	PxSession.cpp,
 	PxSession.h,
+	Version.h,
 	"Resource files" readonly separator,
 	PxView.lay,
 	PxView.t,

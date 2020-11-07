@@ -5,10 +5,10 @@ LAYOUT(PxViewLayout, 768, 480)
 	ITEM(StaticText, numrows_text, LeftPosZ(4, 88).BottomPosZ(1, 19))
 END_LAYOUT
 
-LAYOUT(CharSetLayout, 220, 60)
+LAYOUT(CharsetSelectLayout, 220, 60)
 	ITEM(Button, cancel, SetLabel(t_("Cancel")).RightPosZ(64, 56).BottomPosZ(8, 20))
 	ITEM(Button, ok, SetLabel(t_("Select")).RightPosZ(4, 56).BottomPosZ(8, 20))
-	ITEM(DropList, d, HSizePosZ(8, 4).TopPosZ(8, 19))
+	ITEM(DropList, charsetDL, HSizePosZ(8, 4).TopPosZ(8, 19))
 END_LAYOUT
 
 LAYOUT(HttpSendLayout, 640, 80)
