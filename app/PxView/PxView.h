@@ -1,5 +1,5 @@
-#ifndef _PxView_PxView_h_
-#define _PxView_PxView_h_
+#ifndef PxView_h_
+#define PxView_h_
 
 #include <CtrlLib/CtrlLib.h>
 

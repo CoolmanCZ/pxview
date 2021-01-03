@@ -1,5 +1,5 @@
-#ifndef _PxView_PxRecordView_h_
-#define _PxView_PxRecordView_h_
+#ifndef PxRecordView_h_
+#define PxRecordView_h_
 
 #include <CtrlLib/CtrlLib.h>
 #include <GridCtrl/GridCtrl.h>
