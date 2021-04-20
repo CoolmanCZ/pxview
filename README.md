@@ -1,9 +1,9 @@
-# PxView - Ultimate++ application
-PxView is the Ultimate++ GUI application to open and manipulate Paradox database files.
+# PxView - U++ application
+PxView is the Ue++ GUI application to open and manipulate Paradox database files.
 
 This application is based on the [pxlib](http://pxlib.sourceforge.net/) - a simply and still small C library to read and write Paradox DB files. It supports all versions starting from 3.0. It currently has a very limited set of functions like to open a DB file, read its header and read every single record. It can read and write blob data. The write support is still a bit experimental.
 
-[Ultimate++](http://www.ultimatepp.org/) is a C++ cross-platform rapid application development framework focused on programmers productivity. It includes a set of libraries (GUI, SQL, etc.), and an integrated development environment.
+[U++](http://www.ultimatepp.org/) is a C++ cross-platform rapid application development framework focused on programmers productivity. It includes a set of libraries (GUI, SQL, etc.), and an integrated development environment.
 
 # AppVeyor build status
 [AppVeyor](https://www.appveyor.com) is used to build Windows binaries and deploy them to the GitHub releases directory.
