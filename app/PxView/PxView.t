@@ -105,9 +105,6 @@ csCZ("Zobrazen\303\251 \305\231\303\241dky:")
 
 // PxRecordView.cpp
 
-T_("HTTPS data transfer")
-csCZ("P\305\231enos dat HTTPS protokolem")
-
 T_("Close this DB")
 csCZ("Zav\305\231\303\255t tuto datab\303\241zi")
 
@@ -137,6 +134,9 @@ csCZ("OK")
 
 T_("Cancel")
 csCZ("Zru\305\241it")
+
+T_("HTTPS data transfer")
+csCZ("P\305\231enos dat HTTPS protokolem")
 
 T_("HTTPS data transfer: %d/%d")
 csCZ("P\305\231enos dat HTTPS protokolem: %d/%d")

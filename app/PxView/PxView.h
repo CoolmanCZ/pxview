@@ -20,47 +20,47 @@ namespace Upp {
 
 class PxView : public Upp::WithPxViewLayout<Upp::TopWindow> {
   public:
-	PxView();
-	~PxView() override{};
+    PxView();
+    ~PxView() override{};
 
-	void ShowInfo();
-	void ChangeCharset();
-	void DeleteRow();
-	void ExportJson();
-	void ExportAllJson();
+    void ShowInfo();
+    void ChangeCharset();
+    void DeleteRow();
+    void ExportJson();
+    void ExportAllJson();
 
   private:
-	Upp::Array<PxRecordView> pxArray;
+    Upp::Array<PxRecordView> pxArray;
 
-	Upp::FileSel fileSel;
-	Upp::String filePattern;
+    Upp::FileSel fileSel;
+    Upp::String filePattern = "*.db;*.px;*.x*;*.y*";
 
-	Upp::MenuBar menuBar;
-	Upp::StatusBar statusBar;
-	int currentLang;
+    Upp::MenuBar menuBar;
+    Upp::StatusBar statusBar;
+    int currentLang = Upp::GetCurrentLanguage();
 
-	void Exit();
-	void MakeMenu();
-	void MenuMain(Upp::Bar &menu);
-	void MenuFile(Upp::Bar &menu);
-	void MenuDB(Upp::Bar &menu);
+    void Exit();
+    void MakeMenu();
+    void MenuMain(Upp::Bar &menu);
+    void MenuFile(Upp::Bar &menu);
+    void MenuDB(Upp::Bar &menu);
 
-	void OpenFile();
-	void OpenDirectory();
-	void LoadFile(const Upp::String &filePath);
+    void OpenFile();
+    void OpenDirectory();
+    void LoadFile(const Upp::String &filePath);
 
-	void SaveAs(const int fileType);
-	void SaveAllAs(const int fileType);
+    void SaveAs(int fileType);
+    void SaveAllAs(int fileType);
 
-	void ToggleLang();
-	void RemoveTab();
-	void CountRows();
+    void ToggleLang();
+    void RemoveTab();
+    void CountRows();
 
-	int FindPxRecordView(const Upp::String &filePath);
-	void RemovePxRecordView(const Upp::String &filePath);
-	PxRecordView *GetPxRecordView(const Upp::String &filePath);
+    int FindPxRecordView(const Upp::String &filePath);
+    void RemovePxRecordView(const Upp::String &filePath);
+    PxRecordView *GetPxRecordView(const Upp::String &filePath);
 };
 
 #endif
 
-// vim: ts=4
+// vim: ts=4 sw=4 expandtab
