@@ -37,9 +37,13 @@ class ParadoxSession {
     }
     virtual Vector<SqlColumnInfo> EnumColumns(String database, String table);
 
-    virtual bool IsBlobOpen() const { return (nullptr != pxdoc->px_blob && nullptr != pxdoc->px_blob->mb_stream); }
+    virtual bool IsBlobOpen() const {
+        return (nullptr != pxdoc->px_blob && nullptr != pxdoc->px_blob->mb_stream);
+    }
 
-    virtual bool IsBlob() const { return nullptr != pxdoc->px_blob; }
+    virtual bool IsBlob() const {
+        return nullptr != pxdoc->px_blob;
+    }
 
   private:
     bool open = false;
@@ -62,11 +66,19 @@ class ParadoxSession {
     dword GetInfoType(char px_ftype);
 
   public:
-    String GetFilePath() const { return filepath; }
-    String GetFileName() const { return Upp::GetFileName(filepath); }
+    String GetFilePath() const {
+        return filepath;
+    }
+    String GetFileName() const {
+        return Upp::GetFileName(filepath);
+    }
 
-    int GetNumRecords() const { return PX_get_num_records(pxdoc); }
-    int GetNumFields() const { return PX_get_num_fields(pxdoc); }
+    int GetNumRecords() const {
+        return PX_get_num_records(pxdoc);
+    }
+    int GetNumFields() const {
+        return PX_get_num_fields(pxdoc);
+    }
 
     String GetTableName() const {
         char *str = nullptr;
@@ -130,28 +142,56 @@ class ParadoxSession {
     }
 
     String GetFileTypeName() const;
-    String GetCharsetName() const { return Format("%s%d", "cp", GetCodepage()); }
-    String GetUpdateTime() const { return Upp::Format(Upp::TimeFromUTC(pxdoc->px_head->px_fileupdatetime)); }
+    String GetCharsetName() const {
+        return Format("%s%d", "cp", GetCodepage());
+    }
+    String GetUpdateTime() const {
+        return Upp::Format(Upp::TimeFromUTC(pxdoc->px_head->px_fileupdatetime));
+    }
 
-    int GetNumIndexLevels() const { return pxdoc->px_head->px_numindexlevels; }
-    int GetIndexFieldNumber() const { return pxdoc->px_head->px_indexfieldnumber; }
-    int GetNextAutoInc() const { return pxdoc->px_head->px_autoinc; }
-    int GetRefIntegrity() const { return pxdoc->px_head->px_refintegrity; }
-    char GetSortOrder() const { return pxdoc->px_head->px_sortorder; }
-    char GetModFlags1() const { return pxdoc->px_head->px_modifiedflags1; }
-    char GetModFlags2() const { return pxdoc->px_head->px_modifiedflags2; }
-    bool IsWriteProtected() const { return pxdoc->px_head->px_writeprotected != 0; }
-    int64 GetEncryption() const { return pxdoc->px_head->px_encryption; }           // NOLINT
-    double GetFileVersion() const { return pxdoc->px_head->px_fileversion / 10.0; } // NOLINT
+    int GetNumIndexLevels() const {
+        return pxdoc->px_head->px_numindexlevels;
+    }
+    int GetIndexFieldNumber() const {
+        return pxdoc->px_head->px_indexfieldnumber;
+    }
+    int GetNextAutoInc() const {
+        return pxdoc->px_head->px_autoinc;
+    }
+    int GetRefIntegrity() const {
+        return pxdoc->px_head->px_refintegrity;
+    }
+    char GetSortOrder() const {
+        return pxdoc->px_head->px_sortorder;
+    }
+    char GetModFlags1() const {
+        return pxdoc->px_head->px_modifiedflags1;
+    }
+    char GetModFlags2() const {
+        return pxdoc->px_head->px_modifiedflags2;
+    }
+    bool IsWriteProtected() const {
+        return pxdoc->px_head->px_writeprotected != 0;
+    }
+    int64 GetEncryption() const {
+        return pxdoc->px_head->px_encryption; // NOLINT
+    }
+    double GetFileVersion() const {
+        return pxdoc->px_head->px_fileversion / 10.0; // NOLINT
+    }
 
-    void Close() { PX_close(pxdoc); }
+    void Close() {
+        PX_close(pxdoc);
+    }
     bool Open(const char *filename);
 
     Vector<Value> GetRow(int row, byte charset = 0);
     bool DelRow(int row);
     bool SetRowCol(int row, int col, const Value &value);
 
-    operator pxdoc_t *() { return pxdoc; }
+    operator pxdoc_t *() {
+        return pxdoc;
+    }
 };
 
 } // namespace Upp

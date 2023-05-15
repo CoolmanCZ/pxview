@@ -6,7 +6,9 @@ using namespace Upp;
 #define IMAGEFILE <PxView/PxView.iml>
 #include <Draw/iml_source.h>
 
-GUI_APP_MAIN { PxView().Sizeable().Zoomable().Run(); }
+GUI_APP_MAIN {
+    PxView().Sizeable().Zoomable().Run();
+}
 
 PxView::PxView() {
     Icon(PxViewImg::AppLogo());

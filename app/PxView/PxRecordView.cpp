@@ -243,8 +243,8 @@ void PxRecordView::ShowInfo() {
     w.Run();
 }
 
-String PxRecordView::AsText(String (*format)(const Value &), const char *tab, const char *row, const char *hdrtab,
-                            const char *hdrrow) const {
+String
+PxRecordView::AsText(String (*format)(const Value &), const char *tab, const char *row, const char *hdrtab, const char *hdrrow) const {
     String txt;
     if (hdrtab != nullptr) {
         for (int i = 0; i < GetColumnCount(); ++i) {
@@ -289,7 +289,9 @@ static String sCsvString(const String &text) {
     return r;
 }
 
-static String sCsvFormat(const Value &v) { return (IsNumber(v) || IsVoid(v)) ? AsString(v) : CsvString(AsString(v)); }
+static String sCsvFormat(const Value &v) {
+    return (IsNumber(v) || IsVoid(v)) ? AsString(v) : CsvString(AsString(v));
+}
 
 String PxRecordView::AsCsv(int sep, bool hdr) const {
     String h(0, 2);

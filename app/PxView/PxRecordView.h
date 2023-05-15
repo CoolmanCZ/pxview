@@ -6,7 +6,10 @@
 
 #include "PxSession.h"
 
-enum filetype { csv = 1, json };
+enum filetype {
+    csv = 1,
+    json
+};
 
 class PxRecordView : public Upp::GridCtrl {
   public:
@@ -48,30 +51,47 @@ class PxRecordView : public Upp::GridCtrl {
 
   public:
     Upp::Event<> WhenRemoveTab;
-    void DoRemoveTab() const { WhenRemoveTab(); };
+    void DoRemoveTab() const {
+        WhenRemoveTab();
+    };
 
-    bool IsModified() const override { return modified; }
+    bool IsModified() const override {
+        return modified;
+    }
 
     bool OpenDB(const Upp::String &filePath);
-    bool IsDBOpen() { return px.IsOpen(); }
+    bool IsDBOpen() {
+        return px.IsOpen();
+    }
     void ShowInfo();
     void ChangeCharset();
     void DeleteRow();
     void ExportJson();
     void ExportAllJson();
 
-    Upp::String GetFilePath() const { return px.GetFilePath(); }
-    Upp::String GetFileName() const { return px.GetFileName(); }
+    Upp::String GetFilePath() const {
+        return px.GetFilePath();
+    }
+    Upp::String GetFileName() const {
+        return px.GetFileName();
+    }
 
-    Upp::String AsText(Upp::String (*format)(const Upp::Value &), const char *tab = "\t", const char *row = "\r\n",
-                       const char *hdrtab = "\t", const char *hdrrow = "\r\n") const;
+    Upp::String AsText(Upp::String (*format)(const Upp::Value &),
+                       const char *tab = "\t",
+                       const char *row = "\r\n",
+                       const char *hdrtab = "\t",
+                       const char *hdrrow = "\r\n") const;
     Upp::String AsCsv(int sep = ';', bool hdr = true) const;
     Upp::String AsJson();
 
     Upp::Json GetJson(int row);
-    Upp::Json GetJson() { return GetJson(GetCurrentRow()); }
+    Upp::Json GetJson() {
+        return GetJson(GetCurrentRow());
+    }
 
-    int GetCountRows() { return GetVisibleCount(); }
+    int GetCountRows() {
+        return GetVisibleCount();
+    }
 
     void SaveAsCsv(const Upp::String &dirPath);
     void SaveAsJson(const Upp::String &dirPath);
