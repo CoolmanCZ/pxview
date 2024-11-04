@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (C) 2020-2023 Radek Malcic
+# Copyright (C) 2020-2024 Radek Malcic
 #
 # All rights reserved.
 #
@@ -49,7 +49,7 @@ UPP_SRC_DIR="${UPP_SRC_BASE}/uppsrc"
 
 PROJECT_NAME="app/PxView/PxView.upp"
 
-PROJECT_EXTRA_COMPILE_FLAGS=""
+PROJECT_EXTRA_COMPILE_FLAGS="-Wno-nontrivial-memaccess"
 PROJECT_EXTRA_LINK_FLAGS=""
 PROJECT_FLAGS="-DflagGUI -DflagMT -DflagGCC"
 
