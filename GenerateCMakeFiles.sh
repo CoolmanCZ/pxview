@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (C) 2020-2024 Radek Malcic
+# Copyright (C) 2020-2025 Radek Malcic
 #
 # All rights reserved.
 #
@@ -49,9 +49,18 @@ UPP_SRC_DIR="${UPP_SRC_BASE}/uppsrc"
 
 PROJECT_NAME="app/PxView/PxView.upp"
 
+PROJECT_EXTRA_INCLUDE_DIR=""
+PROJECT_EXTRA_INCLUDE_SUBDIRS=""
 PROJECT_EXTRA_COMPILE_FLAGS="-Wno-nontrivial-memaccess"
 PROJECT_EXTRA_LINK_FLAGS=""
-PROJECT_FLAGS="-DflagGUI -DflagMT -DflagGCC"
+
+if [ $# -lt 1 ]; then
+  echo "# POSIX build"
+  PROJECT_FLAGS="-DflagGUI -DflagMT -DflagGCC -DflagLINUX -DflagPOSIX -DflagSHARED"
+else
+  echo "# WINDOWS build"
+  PROJECT_FLAGS="-DflagGUI -DflagMT -DflagGCC -DflagPOSIX"
+fi
 
 generate_main_cmake_file "${PROJECT_NAME}" "${PROJECT_FLAGS}"
 

@@ -27,5 +27,4 @@ Checks: '-*,
  -readability-magic-numbers'
 WarningsAsErrors: ''
 HeaderFilterRegex: 'app/PxView/.*\.(h|hpp)$'
-AnalyzeTemporaryDtors: false
 FormatStyle:     none

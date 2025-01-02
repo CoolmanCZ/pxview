@@ -21,7 +21,7 @@ namespace Upp {
 class PxView : public Upp::WithPxViewLayout<Upp::TopWindow> {
   public:
     PxView();
-    ~PxView() override{};
+    ~PxView() override {};
 
     void ShowInfo();
     void ChangeCharset();

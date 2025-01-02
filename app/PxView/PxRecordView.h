@@ -14,7 +14,7 @@ enum filetype {
 class PxRecordView : public Upp::GridCtrl {
   public:
     PxRecordView();
-    ~PxRecordView() override{};
+    ~PxRecordView() override {};
 
   private:
     Upp::ParadoxSession px;
