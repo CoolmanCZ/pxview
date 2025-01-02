@@ -11,14 +11,14 @@
 
 #define APP_NAME      "PxView"
 #define APP_TITLE     "Paradox database viewer"
-#define APP_COPYRIGHT "Copyright (c) 2016-2023"
+#define APP_COPYRIGHT "Copyright (c) 2016-2025"
 
 #define APP_MAJOR_VER 1
 #define APP_MINOR_VER 1
-#define APP_PATCH_VER 7
+#define APP_PATCH_VER 8
 #define APP_BUILD_VER 0
 
-#define APP_VERSION_STR "1.1.7"
+#define APP_VERSION_STR "1.1.8"
 #define APP_VERSION_NUM TO_NUMBER(APP_MAJOR_VER, APP_MINOR_VER, APP_PATCH_VER, APP_BUILD_VER)
 
 #define APP_FILEVERSION     APP_MAJOR_VER, APP_MINOR_VER, APP_PATCH_VER, APP_BUILD_VER

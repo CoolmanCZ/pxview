@@ -5,12 +5,13 @@ This application is based on the [pxlib](http://pxlib.sourceforge.net/) - a simp
 
 [U++](http://www.ultimatepp.org/) is a C++ cross-platform rapid application development framework focused on programmers productivity. It includes a set of libraries (GUI, SQL, etc.), and an integrated development environment.
 
-# AppVeyor build status
-[AppVeyor](https://www.appveyor.com) is used to build Windows binaries and deploy them to the GitHub releases directory.
+# GitHub actions build status
+
+[GitHub actions](https://docs.github.com/en/actions) is used to build Windows binaries and deploy them to the GitHub releases directory.
 
 |branch  | status|
 |---     |---    |
-|master  |[![Build status](https://ci.appveyor.com/api/projects/status/github/CoolmanCZ/pxview?svg=true)](https://ci.appveyor.com/project/CoolmanCZ/pxview)|
+|master  | [![PxView CMake build](https://github.com/CoolmanCZ/pxview/actions/workflows/pxview.yml/badge.svg)](https://github.com/CoolmanCZ/pxview/actions/workflows/pxview.yml) |
 
 *The Windows executable is currently not signed, which will show a warning when you run the .exe. Press 'more info' -> 'run anyway' to skip the warning.*
 
