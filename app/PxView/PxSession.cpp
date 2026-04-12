@@ -13,19 +13,33 @@ ParadoxSession::~ParadoxSession() {
 }
 
 bool ParadoxSession::Open(const char *filename) {
+    open = false;
     filepath = filename;
+    blobfilepath.Clear();
 
-    if (0 == PX_open_file(pxdoc, filepath)) {
-        open = true;
-        blobfilepath = AppendFileName(Upp::GetFileDirectory(filename), Upp::GetFileTitle(filename) + ".mb");
-        // TODO: check proper work with the blob file
-        // if (FileExists(blobfilepath) && (0 > PX_set_blob_file(pxdoc, blobfilepath))) {
-        //	ErrorOK(Format("%s: %s", t_("Could not open blob file"), DeQtf(blobfilepath)));
-        //	return false;
-        //}
-        return true;
+    if (0 != PX_open_file(pxdoc, filepath))
+        return false;
+
+    String dir = Upp::GetFileDirectory(filename);
+    String title = Upp::GetFileTitle(filename);
+
+    String lower_blob = AppendFileName(dir, title + ".mb");
+    String upper_blob = AppendFileName(dir, title + ".MB");
+
+    if (FileExists(lower_blob))
+        blobfilepath = lower_blob;
+    else if (FileExists(upper_blob))
+        blobfilepath = upper_blob;
+
+    if (!blobfilepath.IsEmpty()) {
+        if (0 > PX_set_blob_file(pxdoc, blobfilepath)) {
+            ErrorOK(Format("%s: %s", t_("Could not open blob file"), DeQtf(blobfilepath)));
+            return false;
+        }
     }
-    return false;
+
+    open = true;
+    return true;
 }
 
 dword ParadoxSession::GetInfoType(char px_ftype) {
@@ -415,6 +429,7 @@ bool ParadoxSession::SetRowCol(int row, int col, const Value &value) {
             PX_put_data_byte(pxdoc, &data[offset], len1, val);
             break;
         }
+        case pxfBLOb:
         case pxfFmtMemoBLOb:
         case pxfMemoBLOb: {
             String val = Upp::FromUnicode((WString)value, codepage);
